@@ -45,29 +45,29 @@ const CustomDropdown = ({ options, value, onChange }) => {
   return (
     <div ref={ref} className="relative flex-1 min-w-[90px] ">
       <button
-        type="button"
-        className={`
-          w-full border border-[#bfc6ea] rounded-xl bg-white
-          flex justify-between items-center
-          px-2 py-1 text-[13px]
-          sm:px-3 sm:py-2 sm:text-[14px]
-          md:px-4 md:py-2 md:text-[15px]
-          focus:outline-none
-        `}
-        style={{
-          fontFamily: 'Montserrat, sans-serif',
-          fontWeight: 500,
-          lineHeight: '100%',
-          letterSpacing: '0%',
-          textTransform: 'capitalize'
-        }}
-        onClick={() => setOpen((o) => !o)}
-      >
-        {value}
-        <svg width="16" height="10" className="ml-2" viewBox="0 0 24 16" fill="none">
-          <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
-        </svg>
-      </button>
+  type="button"
+  className={`
+    w-full border border-[#bfc6ea] rounded-xl bg-white
+    flex justify-between items-center
+    px-3 py-2 text-[14px] sm:text-[14px] md:text-[15px]
+    focus:outline-none whitespace-nowrap min-h-[44px]
+  `}
+  style={{
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: 500,
+    lineHeight: '100%',
+    letterSpacing: '0%',
+    textTransform: 'capitalize'
+  }}
+  onClick={() => setOpen((o) => !o)}
+>
+  <span className="truncate">{value}</span>
+  <span className="ml-2 flex-shrink-0">
+    <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
+      <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
+    </svg>
+  </span>
+</button>
       {open && (
         <ul
           className={`
