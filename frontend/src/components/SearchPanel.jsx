@@ -43,7 +43,7 @@ const CustomDropdown = ({ options, value, onChange }) => {
   }, []);
 
   return (
-    <div ref={ref} className="relative flex-1 min-w-[90px] max-w-[160px]">
+    <div ref={ref} className="relative flex-1 min-w-[90px] ">
       <button
         type="button"
         className={`
@@ -136,7 +136,7 @@ const SearchPanel = () => {
       {/* Filters */}
       <div className="w-[90%] max-w-4xl bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3">
         {/* Dropdowns */}
-        <div className="flex gap-4">
+        <div className="flex gap-4 w-full">
           <CustomDropdown options={ageOptions} value={age} onChange={setAge} />
           <CustomDropdown options={countyOptions} value={county} onChange={setCounty} />
           <CustomDropdown options={insuranceOptions} value={insurance} onChange={setInsurance} />
