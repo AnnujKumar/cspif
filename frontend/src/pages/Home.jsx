@@ -17,11 +17,11 @@ import {
 
 // Combine all arrays into one master array
 const combinedServices = [
-  ...allServices,
-  ...childWelfareServices,
-  ...probationServices,
+  ...behavioralHealthPlacements,
   ...probationPlacements,
-  ...behavioralHealthPlacements
+  ...probationServices,
+  ...childWelfareServices,
+  ...allServices
 ];
 
 const Home = () => {
