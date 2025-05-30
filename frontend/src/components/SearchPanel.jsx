@@ -6,7 +6,7 @@ import { IoMdClose } from 'react-icons/io';
 const ageOptions = ["Age", "0-5", "6-12", "13-17", "18+"];
 const countyOptions = ["County", "Alameda", "Los Angeles", "Sacramento", "San Diego"];
 const insuranceOptions = [
-  "Insurance",
+  "Insurance",                             
   "Private",
   "MediCal Managed Care",
   "MediCal FFS",
@@ -174,12 +174,12 @@ const SearchPanel = ({ onSearch }) => {
   return (
     <div className="w-screen flex flex-col items-center bg-[#f6f8ff] py-6 border border-blue-200 rounded-b-lg">
       {/* Description */}
-      <div className="max-w-3xl text-center text-xs text-gray-700 mb-4">
+      <div className="w-[75%] text-center text-xs text-gray-700 mb-4">
         CBSI activates CFPIC's vision to support AB 2083 Children, Youth & Families System of Care (CYFSOC) leadership by helping them advance their partnerships across all child and family serving systems, at every level. The goals of CBSI are to enhance the care continuum for children and youth, and particularly those with complex care needs and who are involved in multiple systems.
       </div>
 
       {/* Filters */}
-      <div className="w-[90%] max-w-4xl bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3">
+      <div className="w-[75%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3">
         {/* Dropdowns */}
         <div className="flex gap-4 w-full">
           <CustomDropdown options={ageOptions} value={age} onChange={setAge} />
@@ -217,7 +217,7 @@ const SearchPanel = ({ onSearch }) => {
               key={chip}
               style={buttonTextStyle}
               onClick={() => handleFilterSelect(idx)}
-              className={`px-6 py-2 rounded-full border-2 font-medium whitespace-nowrap transition-colors duration-150
+              className={`px-3 py-2 rounded-full border-2 font-medium whitespace-nowrap transition-colors duration-150
                 ${idx === selectedFilter
                   ? 'bg-[#D14B3A] text-white border-[#D14B3A]'
                   : 'bg-white text-[#222] border-[#E8ECFF] hover:bg-white hover:border-gray-300'
@@ -230,7 +230,7 @@ const SearchPanel = ({ onSearch }) => {
       </div>
 
       {/* Clear All Button moved outside */}
-      <div className="w-[90%] max-w-4xl flex justify-end mt-4">
+      <div className="w-[81%] max-w-6xl flex justify-end mt-4 pr-7">
         <button
           onClick={clearAll}
           style={buttonTextStyle}

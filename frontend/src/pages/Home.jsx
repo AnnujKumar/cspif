@@ -59,7 +59,7 @@ const Home = () => {
       </div>
 
       {/* Search Panel */}
-      <div className="w-full sm:px-2">
+      <div className="min-w-full sm:px-2">
         <SearchPanel onSearch={setFilters} />
       </div>
 

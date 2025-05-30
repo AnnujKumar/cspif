@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 
-// Partner badge color mapping (add more as needed)
+// Partner badge color mapping (only 3 allowed colors)
 const partnerColors = {
-  CWS: "bg-[#e3eaff] text-[#2563eb]",
-  Probation: "bg-[#ffb3b3] text-[#d14b3a]",
-  "County Mental": "bg-[#d1c4e9] text-[#7d89c2]",
-  "Health Plan": "bg-[#b2f0e6] text-[#1e7066]",
-  "Mental Health Plan (MHP)": "bg-[#ffe0b2] text-[#e65100]",
-  "County SUD": "bg-[#b2dfdb] text-[#00695c]",
-  "Child Welfare": "bg-[#fce4ec] text-[#ad1457]",
-  "County Mental Health Plan": "bg-[#d1c4e9] text-[#512da8]",
-  "Other": "bg-[#f3e5f5] text-[#6a1b9a]",
+  CWS: "bg-[#8185E7] text-white",
+  Probation: "bg-[#FF5B5B] text-white",
+  "County Mental": "bg-[#40B5E3] text-white",
+  "Health Plan": "bg-[#8185E7] text-white",
+  "Mental Health Plan (MHP)": "bg-[#FF5B5B] text-white",
+  "County SUD": "bg-[#40B5E3] text-white",
+  "Child Welfare": "bg-[#8185E7] text-white",
+  "County Mental Health Plan": "bg-[#FF5B5B] text-white",
+  "Other": "bg-[#40B5E3] text-white",
   // fallback color will be used if not found
 };
 
@@ -25,7 +25,7 @@ const ResourceListing = ({ services = [] }) => {
 
   return (
     <div
-      className="flex flex-col flex-1 bg-white rounded-xl border border-[#bfc6ea] p-0"
+      className="flex flex-col flex-1 bg-white rounded-xl border border-[#bfc6ea] p-0 hide-scrollbar"
       style={{
         height: "75vh",
         minHeight: "500px",
@@ -38,51 +38,95 @@ const ResourceListing = ({ services = [] }) => {
         <span
           className="font-semibold"
           style={{
-            color: "#1D4CA5",
+            color: "#015AB8",
             fontFamily: "'Open Sans', sans-serif"
           }}
         >
           Resource Listing
         </span>
         <button
-          className="flex items-center bg-[#d14b3a] hover:bg-[#b53c2a] text-white rounded-lg px-4 py-2 text-sm font-normal uppercase transition"
+          className="flex items-center rounded-lg px-4 py-2 text-sm font-normal uppercase transition"
+          style={{ background: "#CB3525", color: "#fff" }}
         >
           PRINT RESULTS
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <rect x="6" y="9" width="12" height="7" rx="1" stroke="currentColor" strokeWidth="2" fill="none"/>
-            <path d="M6 17v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="2" fill="none"/>
-            <path d="M6 7V5a1 1 0 011-1h10a1 1 0 011 1v2" stroke="currentColor" strokeWidth="2" fill="none"/>
-            <circle cx="17" cy="13" r="1" fill="currentColor"/>
+          <svg width="16" height="15" viewBox="0 0 16 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-2">
+            <path d="M11.6667 3.89799V1.14799H4.33335V3.89799H3.41668V0.231323H12.5833V3.89799H11.6667ZM13.1471 7.10632C13.4068 7.10632 13.6247 7.01832 13.8007 6.84232C13.9767 6.66632 14.0644 6.44877 14.0638 6.18966C14.0632 5.93055 13.9755 5.71268 13.8007 5.53607C13.6259 5.35946 13.408 5.27146 13.1471 5.27207C12.8862 5.27268 12.6686 5.36068 12.4944 5.53607C12.3203 5.71146 12.2323 5.92932 12.2304 6.18966C12.2286 6.44999 12.3166 6.66755 12.4944 6.84232C12.6723 7.0171 12.8892 7.1051 13.1471 7.10632ZM11.6667 13.4167V9.25682H4.33335V13.4167H11.6667ZM12.5833 14.3333H3.41668V10.6667H0.278931V3.89799H15.7211V10.6667H12.5833V14.3333ZM14.8044 9.74999V4.81466H1.1956V9.74999H3.41668V8.34016H12.5833V9.74999H14.8044Z" fill="#fff"/>
           </svg>
         </button>
       </div>
-      <table className="w-full text-sm border-separate table-fixed" style={{ borderSpacing: "0 4px" }}>
+      <table className="w-full text-sm border-separate table-fixed " style={{ borderSpacing: "0 4px" }}>
         <colgroup>
           <col style={{ width: "16%" }} />
           <col style={{ width: "28%" }} />
           <col style={{ width: "18%" }} />
           <col style={{ width: "18%" }} />
-          <col style={{ width: "15%" }} />
-          <col style={{ width: "5%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "10%" }} />
         </colgroup>
-        <thead className="sticky top-[64px] z-10" style={{ background: "#0561c9" }}>
+        <thead
+          className="sticky top-[64px] z-10"
+          style={{
+            background: "#0561c9",
+            width: "1136px",
+            height: "66px",
+            minHeight: "66px",
+            maxHeight: "66px",
+          }}
+        >
           <tr className="bg-[#0561c9]">
-            <th className="text-white font-semibold py-2 px-2 text-left">
+            <th
+              className="text-white font-semibold py-2 px-2 text-left"
+              style={{
+                height: "66px",
+                minHeight: "66px",
+                maxHeight: "66px",
+              }}
+            >
               Service Type
             </th>
-            <th className="text-white font-semibold py-2 px-2 text-left">
+            <th className="text-white font-semibold py-2 px-2 text-left"
+              style={{
+                height: "66px",
+                minHeight: "66px",
+                maxHeight: "66px",
+              }}
+            >
               Description Of Service
             </th>
-            <th className="text-white font-semibold py-2 px-2 text-left">
+            <th className="text-white font-semibold py-2 px-2 text-left"
+              style={{
+                height: "66px",
+                minHeight: "66px",
+                maxHeight: "66px",
+              }}
+            >
               Eligibility
             </th>
-            <th className="text-white font-semibold py-2 px-2 text-left">
+            <th className="text-white font-semibold py-2 px-2 text-left"
+              style={{
+                height: "66px",
+                minHeight: "66px",
+                maxHeight: "66px",
+              }}
+            >
               Partners Involved
             </th>
-            <th className="text-white font-semibold py-2 px-2 text-left">
+            <th className="text-white font-semibold py-2 px-2 text-left"
+              style={{
+                height: "66px",
+                minHeight: "66px",
+                maxHeight: "66px",
+              }}
+            >
               Associated Direction
             </th>
-            <th className="text-white font-semibold py-2 px-2 text-left">
+            <th className="text-white font-semibold py-2 px-2 text-left"
+              style={{
+                height: "66px",
+                minHeight: "66px",
+                maxHeight: "66px",
+              }}
+            >
               {/* Empty header for actions */}
             </th>
           </tr>
@@ -116,18 +160,39 @@ const ResourceListing = ({ services = [] }) => {
                   }}
                   onClick={() => setSelectedIdx(idx)}
                 >
-                  <td className={`py-3 px-2 align-top font-semibold ${isSelected ? "text-[#d14b3a]" : "text-[#2563eb]"}`}>
+                  <td className={`py-3 px-2 align-top font-semibold ${isSelected ? "text-[#d14b3a]" : "text-[#1B4AA4]"}`}>
                     {res.type || res.title}
                   </td>
-                  <td className="py-3 px-2 align-top text-[#222]">
-                    {isSelected
-                      ? res.description
-                      : res.shortDescription
-                        ?? (typeof res.description === "string"
-                          ? res.description.length > 120
-                            ? res.description.slice(0, 120) + "..."
-                            : res.description
-                          : "")}
+                  <td className="py-3 px-2 align-top text-[#222]" style={{ position: "relative", overflow: "visible" }}>
+                    <div style={{ wordBreak: "break-word", maxWidth: "100%" }}>
+                      {isSelected
+                        ? (
+                          <>
+                            
+                            {/* Expanded details only in Description column */}
+                            <div
+                              className=" rounded  transition-all duration-300 text-sm text-[#222]"
+                              style={{
+                                width: "100%",
+                                maxWidth: "100%",
+                                wordBreak: "break-word",
+                                overflowWrap: "break-word",
+                                overflow: "hidden",
+                              }}
+                            >
+                               {res.description}
+                            
+                              
+                            </div>
+                          </>
+                        )
+                        : res.shortDescription
+                          ?? (typeof res.description === "string"
+                            ? res.description.length > 120
+                              ? res.description.slice(0, 120) + "..."
+                              : res.description
+                            : "")}
+                    </div>
                   </td>
                   <td className="py-3 px-2 align-top text-[#222]">
                     {isSelected
@@ -141,10 +206,10 @@ const ResourceListing = ({ services = [] }) => {
                   </td>
                   <td className="py-3 px-2 align-top">
                     <div className="flex flex-wrap gap-2">
-                      {(res.partners || []).map((p) => (
+                      {(res.partners || []).map((p, i) => (
                         <span
-                          key={p}
-                          className={`inline-block px-2 py-1 rounded-lg text-xs font-semibold ${partnerColors[p] || "bg-[#e3eaff] text-[#2563eb]"}`}
+                          key={p + i}
+                          className={`inline-block px-2 py-1 rounded-lg text-xs font-semibold ${partnerColors[p] || "bg-[#8185E7] text-white"}`}
                         >
                           {p}
                         </span>
@@ -158,7 +223,15 @@ const ResourceListing = ({ services = [] }) => {
                   </td>
                   {/* Action buttons column */}
                   <td className="py-3 px-2 align-top">
-                    <div className="flex flex-col gap-2">
+                    <div
+                      className="flex flex-col gap-2"
+                      style={{
+                        alignItems: "flex-end",
+                        maxWidth: "100%",
+                        overflow: "hidden",
+                        wordBreak: "break-word",
+                      }}
+                    >
                       {/* Add/Remove Button */}
                       {isSelected ? (
                         <button
@@ -171,9 +244,10 @@ const ResourceListing = ({ services = [] }) => {
                           }}
                           style={{ boxShadow: "none", border: "none" }}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <rect x="4" y="4" width="16" height="16" rx="4" fill="#faa9a0"/>
-                            <rect x="8" y="11" width="8" height="2" rx="1" fill="white"/>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 32 32">
+                            <rect x="4" y="4" width="24" height="24" rx="8" fill="#faa9a0"/>
+                            {/* Removed inner white border, made center line thinner and longer */}
+                            <rect x="10" y="15" width="12" height="2" rx="1" fill="white"/>
                           </svg>
                         </button>
                       ) : (
@@ -195,15 +269,22 @@ const ResourceListing = ({ services = [] }) => {
                       {/* Print Button */}
                       <button
                         type="button"
-                        className="p-1 rounded hover:bg-[#e3eaff] transition"
+                        className={`w-8 h-8 flex items-center justify-center rounded-lg ${
+                          isSelected ? "bg-[#fff8ee]" : "bg-[#f6f8fc]"
+                        }`}
                         title="Print"
                         onClick={e => { e.stopPropagation(); /* handle print */ }}
+                        style={{ boxShadow: "none", border: "none", padding: 0 }}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-[#2563eb]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <rect x="6" y="9" width="12" height="7" rx="1" stroke="currentColor" strokeWidth="2" fill="none"/>
-                          <path d="M6 17v2a1 1 0 001 1h10a1 1 0 001-1v-2" stroke="currentColor" strokeWidth="2" fill="none"/>
-                          <path d="M6 7V5a1 1 0 011-1h10a1 1 0 011 1v2" stroke="currentColor" strokeWidth="2" fill="none"/>
-                          <circle cx="17" cy="13" r="1" fill="currentColor"/>
+                        <svg
+                          width="16"
+                          height="15"
+                          viewBox="0 0 16 15"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          style={{ display: "block", margin: "auto" }}
+                        >
+                          <path d="M11.6667 3.89799V1.14799H4.33335V3.89799H3.41668V0.231323H12.5833V3.89799H11.6667ZM13.1471 7.10632C13.4068 7.10632 13.6247 7.01832 13.8007 6.84232C13.9767 6.66632 14.0644 6.44877 14.0638 6.18966C14.0632 5.93055 13.9755 5.71268 13.8007 5.53607C13.6259 5.35946 13.408 5.27146 13.1471 5.27207C12.8862 5.27268 12.6686 5.36068 12.4944 5.53607C12.3203 5.71146 12.2323 5.92932 12.2304 6.18966C12.2286 6.44999 12.3166 6.66755 12.4944 6.84232C12.6723 7.0171 12.8892 7.1051 13.1471 7.10632ZM11.6667 13.4167V9.25682H4.33335V13.4167H11.6667ZM12.5833 14.3333H3.41668V10.6667H0.278931V3.89799H15.7211V10.6667H12.5833V14.3333ZM14.8044 9.74999V4.81466H1.1956V9.74999H3.41668V8.34016H12.5833V9.74999H14.8044Z" fill="#4766C3"/>
                         </svg>
                       </button>
                     </div>
@@ -214,6 +295,17 @@ const ResourceListing = ({ services = [] }) => {
           )}
         </tbody>
       </table>
+      <style>
+{`
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+`}
+</style>
     </div>
   );
 };
