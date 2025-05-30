@@ -97,7 +97,7 @@ const CustomDropdown = ({ options, value, onChange }) => {
   );
 };
 
-const SearchPanel = () => {
+const SearchPanel = ({ onSearch }) => {
   // State for selected filter and search input
   const [selectedFilter, setSelectedFilter] = useState(0); // Default to "All"
   const [searchInput, setSearchInput] = useState('');
@@ -105,6 +105,21 @@ const SearchPanel = () => {
   const [county, setCounty] = useState(countyOptions[0]);
   const [insurance, setInsurance] = useState(insuranceOptions[0]);
   const [cw, setCw] = useState(cwOptions[0]);
+
+  // Send filters to parent whenever any filter/search changes
+  useEffect(() => {
+    if (onSearch) {
+      onSearch({
+        search: searchInput,
+        age,
+        county,
+        insurance,
+        cw,
+        selectedFilter: filterChips[selectedFilter]
+      });
+    }
+    // eslint-disable-next-line
+  }, [searchInput, age, county, insurance, cw, selectedFilter]);
 
   // Handle filter selection
   const handleFilterSelect = (index) => {
@@ -124,6 +139,13 @@ const SearchPanel = () => {
     setCounty(countyOptions[0]);
     setInsurance(insuranceOptions[0]);
     setCw(cwOptions[0]);
+  };
+
+  // Handle Enter key in search bar (optional, but not needed for auto-update)
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      // No-op, since filtering is now live
+    }
   };
 
   return (
@@ -152,6 +174,7 @@ const SearchPanel = () => {
             className="flex-1 bg-transparent outline-none text-gray-700"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
           />
           {searchInput && (
             <button onClick={clearSearch}>

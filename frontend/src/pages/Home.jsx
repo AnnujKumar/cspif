@@ -6,8 +6,50 @@ import Sidebar from '../components/Sidebar'
 import ResourceListing from '../components/ResourceListing'
 import SidebarButton from '../components/SidebarButton'
 
+// Import all service arrays
+import {
+  allServices,
+  childWelfareServices,
+  probationServices,
+  probationPlacements,
+  behavioralHealthPlacements
+} from '../data/allServices'
+
+// Combine all arrays into one master array
+const combinedServices = [
+  ...allServices,
+  ...childWelfareServices,
+  ...probationServices,
+  ...probationPlacements,
+  ...behavioralHealthPlacements
+];
+
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [filters, setFilters] = useState(null);
+
+  // Filtering logic
+  const filteredServices = React.useMemo(() => {
+    if (!filters) return combinedServices;
+    return combinedServices.filter(service => {
+      // Search filter (case-insensitive, matches title or description)
+      const search = filters.search?.trim().toLowerCase() || '';
+      const matchesSearch =
+        !search ||
+        service.title.toLowerCase().includes(search) ||
+        service.description.toLowerCase().includes(search);
+
+      // Dropdown filters (skip if default selected)
+      const matchesAge = !filters.age || filters.age === "Age" || service.age === filters.age;
+      const matchesCounty = !filters.county || filters.county === "County" || service.county === filters.county;
+      const matchesInsurance = !filters.insurance || filters.insurance === "Insurance" || service.insurance === filters.insurance;
+      const matchesCw = !filters.cw || filters.cw === "CW" || service.cw === filters.cw;
+
+      // You can add more filter logic for selectedFilter if needed
+
+      return matchesSearch && matchesAge && matchesCounty && matchesInsurance && matchesCw;
+    });
+  }, [filters]);
 
   return (
     <div className="bg-[#f6f8ff] flex flex-col min-h-screen w-full relative overflow-x-hidden">
@@ -18,7 +60,7 @@ const Home = () => {
 
       {/* Search Panel */}
       <div className="w-full sm:px-2">
-        <SearchPanel />
+        <SearchPanel onSearch={setFilters} />
       </div>
 
       {/* Main content area with blur overlay when sidebarOpen */}
@@ -33,8 +75,7 @@ const Home = () => {
             }}
           />
         )}
-        <div
-          className={
+        <div className={
             sidebarOpen
               ? "flex w-full max-w-none gap-4 pl-2 pr-0 pb-6 mt-2 relative"
               : "flex w-full max-w-[1400px] mx-auto gap-4 px-2 pb-6 mt-2 relative"
@@ -88,7 +129,7 @@ const Home = () => {
             {/* Resource Listing */}
             <div className="relative flex-1 flex flex-col w-full">
               <div className={sidebarOpen ? "transition-all duration-300 relative z-10" : ""}>
-                <ResourceListing />
+                <ResourceListing services={filteredServices} />
                 <div className="flex justify-end mt-12">
                   <button
                     className="bg-[#D14B3A] text-white rounded-md px-6 py-2 flex items-center gap-2 font-semibold shadow-sm hover:bg-[#b53e2f] transition"
