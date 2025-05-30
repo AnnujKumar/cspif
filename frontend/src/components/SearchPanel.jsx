@@ -105,29 +105,6 @@ const SearchPanel = ({ onSearch }) => {
   const [county, setCounty] = useState(countyOptions[0]);
   const [insurance, setInsurance] = useState(insuranceOptions[0]);
   const [cw, setCw] = useState(cwOptions[0]);
-  const [isActive, setIsActive] = useState(false);
-  const searchInputRef = useRef();
-
-  // Listen for any keydown event and focus the search input
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Ignore if user is typing in an input/textarea already
-      if (
-        document.activeElement.tagName === "INPUT" ||
-        document.activeElement.tagName === "TEXTAREA" ||
-        document.activeElement.isContentEditable
-      ) {
-        return;
-      }
-      // Only activate for visible characters (not ctrl, shift, etc.)
-      if (e.key.length === 1) {
-        setIsActive(true);
-        searchInputRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   // Send filters to parent whenever any filter/search changes
   useEffect(() => {
@@ -192,17 +169,13 @@ const SearchPanel = ({ onSearch }) => {
         <div className="flex items-center border rounded-lg px-4 py-4 bg-white">
           <FaSearch className="text-gray-400 mr-2" />
           <input
-  ref={searchInputRef}
-  type="text"
-  placeholder="Search"
-  className={`flex-1 bg-white outline-none border-none shadow-none focus:ring-0 focus:border-transparent text-gray-700 transition-all duration-150 ${isActive ? "ring-2 ring-[#3eb6e0]" : ""}`}
-  style={{ boxShadow: "none" }}
-  value={searchInput}
-  onChange={(e) => setSearchInput(e.target.value)}
-  onKeyDown={handleSearchKeyDown}
-  onFocus={() => setIsActive(true)}
-  onBlur={() => setIsActive(false)}
-/>
+            type="text"
+            placeholder="Search"
+            className="flex-1 bg-transparent outline-none text-gray-700"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+          />
           {searchInput && (
             <button onClick={clearSearch}>
               <IoMdClose className="text-gray-400 text-lg" />

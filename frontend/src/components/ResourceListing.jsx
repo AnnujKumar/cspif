@@ -33,10 +33,19 @@ const ResourceListing = ({ services = [] }) => {
         overflowY: "auto"
       }}
     >
-      <div className="flex items-center justify-between p-4">
-        <span className="text-[#2563eb] font-semibold text-sm tracking-wide">RESOURCE LISTING</span>
+      {/* Sticky header with title and print button */}
+      <div className="sticky top-0 z-20 bg-white flex items-center justify-between p-4">
+        <span
+          className="font-semibold"
+          style={{
+            color: "#1D4CA5",
+            fontFamily: "'Open Sans', sans-serif"
+          }}
+        >
+          Resource Listing
+        </span>
         <button
-          className="flex items-center bg-[#d14b3a] hover:bg-[#b53c2a] text-white rounded-lg px-2 py-2 text-sm font-normal uppercase transition"
+          className="flex items-center bg-[#d14b3a] hover:bg-[#b53c2a] text-white rounded-lg px-4 py-2 text-sm font-normal uppercase transition"
         >
           PRINT RESULTS
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -47,8 +56,16 @@ const ResourceListing = ({ services = [] }) => {
           </svg>
         </button>
       </div>
-      <table className="w-full text-sm border-separate" style={{ borderSpacing: "0 4px" }}>
-        <thead>
+      <table className="w-full text-sm border-separate table-fixed" style={{ borderSpacing: "0 4px" }}>
+        <colgroup>
+          <col style={{ width: "16%" }} />
+          <col style={{ width: "28%" }} />
+          <col style={{ width: "18%" }} />
+          <col style={{ width: "18%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "5%" }} />
+        </colgroup>
+        <thead className="sticky top-[64px] z-10" style={{ background: "#0561c9" }}>
           <tr className="bg-[#0561c9]">
             <th className="text-white font-semibold py-2 px-2 text-left">
               Service Type
