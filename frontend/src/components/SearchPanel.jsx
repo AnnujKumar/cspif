@@ -174,7 +174,7 @@ const SearchPanel = ({ onSearch }) => {
   return (
     <div className="w-screen flex flex-col items-center bg-[#f6f8ff] py-6 border border-blue-200 rounded-b-lg">
       {/* Description */}
-      <div className="w-[75%] text-center text-xs text-gray-700 mb-4">
+      <div className="w-[75%] text-center text-xs text-gray-700 mb-4" style={{"fontSize":"14px"}}>
         CBSI activates CFPIC's vision to support AB 2083 Children, Youth & Families System of Care (CYFSOC) leadership by helping them advance their partnerships across all child and family serving systems, at every level. The goals of CBSI are to enhance the care continuum for children and youth, and particularly those with complex care needs and who are involved in multiple systems.
       </div>
 
@@ -189,20 +189,26 @@ const SearchPanel = ({ onSearch }) => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex items-center border rounded-lg px-4 py-4 bg-white">
+        <div className={`flex items-center rounded-lg px-4 py-4 bg-white transition-all duration-150
+          ${isActive ? "border-[#005CB9]" : "border-[#B7B9EA]"}
+        `}
+        style={{
+          borderWidth: "1px",
+          borderStyle: "solid",
+        }}>
           <FaSearch className="text-gray-400 mr-2" />
           <input
-  ref={searchInputRef}
-  type="text"
-  placeholder="Search"
-  className={`flex-1 bg-white outline-none border-none shadow-none focus:ring-0 focus:border-transparent text-gray-700 transition-all duration-150 ${isActive ? "ring-2 ring-[#3eb6e0]" : ""}`}
-  style={{ boxShadow: "none" }}
-  value={searchInput}
-  onChange={(e) => setSearchInput(e.target.value)}
-  onKeyDown={handleSearchKeyDown}
-  onFocus={() => setIsActive(true)}
-  onBlur={() => setIsActive(false)}
-/>
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search"
+            className={`flex-1 bg-white outline-none border-none shadow-none focus:ring-0 text-gray-700 transition-all duration-150`}
+            style={{ boxShadow: "none" }}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            onFocus={() => setIsActive(true)}
+            onBlur={() => setIsActive(false)}
+          />
           {searchInput && (
             <button onClick={clearSearch}>
               <IoMdClose className="text-gray-400 text-lg" />
@@ -211,7 +217,7 @@ const SearchPanel = ({ onSearch }) => {
         </div>
 
         {/* Filter Chips */}
-        <div className="flex flex-nowrap overflow-x-auto gap-2 mt-1 pb-2">
+        <div className="flex flex-wrap overflow-x-auto gap-2 mt-1 pb-2">
           {filterChips.map((chip, idx) => (
             <button
               key={chip}
@@ -230,7 +236,7 @@ const SearchPanel = ({ onSearch }) => {
       </div>
 
       {/* Clear All Button moved outside */}
-      <div className="w-[81%] max-w-6xl flex justify-end mt-4 pr-7">
+      <div className="w-[75%] flex justify-end mt-2">
         <button
           onClick={clearAll}
           style={buttonTextStyle}

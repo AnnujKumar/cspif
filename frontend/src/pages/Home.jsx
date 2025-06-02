@@ -78,7 +78,7 @@ const Home = () => {
         <div className={
             sidebarOpen
               ? "flex w-full max-w-none gap-4 pl-2 pr-0 pb-6 mt-2 relative"
-              : "flex w-full max-w-[1400px] mx-auto gap-4 px-2 pb-6 mt-2 relative"
+              : "flex w-full  mx-auto gap-4 px-2 pb-6 mt-2 relative"
           }
         >
           {/* Desktop Sidebar (1025px and up) */}
@@ -132,11 +132,11 @@ const Home = () => {
                 <ResourceListing services={filteredServices} />
                 <div className="flex justify-end mt-12">
                   <button
-                    className="bg-[#D14B3A] text-white rounded-md px-6 py-2 flex items-center gap-2 font-semibold shadow-sm hover:bg-[#b53e2f] transition"
+                    className="bg-[#CB3525] text-white rounded-md px-4 py-2 flex items-center gap-2 font-semibold shadow-sm hover:bg-[#b53e2f] transition"
                     style={{
                       boxShadow: "0 1px 2px 0 rgba(16, 24, 40, 0.05)",
                       border: "none",
-                      fontSize: "16px",
+                      fontSize: "14px",
                       lineHeight: "20px",
                       minWidth: "auto",
                       minHeight: "auto",
@@ -149,8 +149,8 @@ const Home = () => {
                         background: "rgba(255,255,255,0.10)",
                         borderRadius: "4px",
                         border: "1px solid #fff",
-                        width: "24px",
-                        height: "24px",
+                        width: "20px",
+                        height: "20px",
                         display: "inline-flex",
                       }}
                     >
@@ -165,8 +165,10 @@ const Home = () => {
           </div>
         </div>
       </div>
-
-      <Footer />
+      <div classname="flex min-w-full">
+<Footer />
+      </div>
+      
     </div>
   )
 }
