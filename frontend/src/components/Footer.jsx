@@ -5,17 +5,16 @@ import { RxCross2 } from "react-icons/rx";
 const Footer = () => (
   <footer className="w-full">
     {/* Blue bar at the top */}
-    <div className="w-full h-2 bg-[#1761ac]" />
-    <div className="bg-[#142938] w-full py-6 px-4">
+    <div className="md:w-full h-2 bg-[#1761ac] " />
+    <div className="bg-[#142938] w-full py-6 md:px-4 px-14">
       <div className="mx-auto flex flex-col md:flex-row items-center justify-evenly gap-6">
         {/* Email Section */}
         <div className="flex items-center">
           <div
             className="flex items-center bg-[#CB3525] border border-white rounded-r-full rounded-l-full"
             style={{
-              width: "357px",
-              height: "73px",
-              
+              maxWidth: "357px",
+              maxHeight: "73px",
               border: "2px solid #fff",
               background: "#CB3525",
               paddingLeft: "0px",
@@ -91,7 +90,7 @@ const Footer = () => (
         </div>
 
         {/* Socials */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center md:gap-8 gap-4">
           <div className="flex flex-col items-center">
             {/* Facebook SVG */}
             <span className="mb-1">

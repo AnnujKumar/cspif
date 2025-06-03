@@ -42,32 +42,37 @@ const CustomDropdown = ({ options, value, onChange }) => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Determine border color
+  const borderColor = open ? "#005CB9" : "#bfc6ea";
+
   return (
-    <div ref={ref} className="relative flex-1 min-w-[90px] ">
+    <div ref={ref} className="relative flex-1">
       <button
-  type="button"
-  className={`
-    w-full border border-[#bfc6ea] rounded-xl bg-white
-    flex justify-between items-center
-    px-3 py-2 text-[14px] sm:text-[14px] md:text-[15px]
-    focus:outline-none whitespace-nowrap min-h-[44px]
-  `}
-  style={{
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 500,
-    lineHeight: '100%',
-    letterSpacing: '0%',
-    textTransform: 'capitalize'
-  }}
-  onClick={() => setOpen((o) => !o)}
->
-  <span className="truncate">{value}</span>
-  <span className="ml-2 flex-shrink-0">
-    <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
-      <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
-    </svg>
-  </span>
-</button>
+        type="button"
+        className={`
+          min-w-full rounded-xl bg-white
+          flex justify-between items-center
+          px-3 py-2 text-[14px] sm:text-[14px] md:text-[15px]
+          focus:outline-none whitespace-nowrap min-h-[44px]
+          transition-colors duration-150
+        `}
+        style={{
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 500,
+          lineHeight: '100%',
+          letterSpacing: '0%',
+          textTransform: 'capitalize',
+          border: `2px solid ${borderColor}`,
+        }}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="truncate">{value}</span>
+        <span className="ml-2 flex-shrink-0">
+          <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
+            <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
+          </svg>
+        </span>
+      </button>
       {open && (
         <ul
           className={`
@@ -172,22 +177,24 @@ const SearchPanel = ({ onSearch }) => {
   };
 
   return (
-    <div className="w-screen flex flex-col items-center bg-[#f6f8ff] py-6 border border-blue-200 rounded-b-lg">
+    <div className="w-screen flex flex-col items-center bg-[#f6f8ff] py-6 border border-blue-200 rounded-b-lg px-4">
       {/* Description */}
-      <div className="w-[75%] text-center text-xs text-gray-700 mb-4" style={{"fontSize":"14px"}}>
+      <div
+        className="w-full md:w-[75%] mx-auto text-xs text-gray-700 mb-4 px-4  md:text-center sm:text-justify "
+        style={{ fontSize: "14px" }}
+      >
         CBSI activates CFPIC's vision to support AB 2083 Children, Youth & Families System of Care (CYFSOC) leadership by helping them advance their partnerships across all child and family serving systems, at every level. The goals of CBSI are to enhance the care continuum for children and youth, and particularly those with complex care needs and who are involved in multiple systems.
       </div>
 
       {/* Filters */}
-      <div className="w-[75%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3">
+      <div className="md:w-[75%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3 sm:w-full">
         {/* Dropdowns */}
-        <div className="flex gap-4 w-full">
+        <div className="flex gap-4 w-full flex-col sm:flex-row">
           <CustomDropdown options={ageOptions} value={age} onChange={setAge} />
           <CustomDropdown options={countyOptions} value={county} onChange={setCounty} />
           <CustomDropdown options={insuranceOptions} value={insurance} onChange={setInsurance} />
           <CustomDropdown options={cwOptions} value={cw} onChange={setCw} />
         </div>
-
         {/* Search Bar */}
         <div className={`flex items-center rounded-lg px-4 py-4 bg-white transition-all duration-150
           ${isActive ? "border-[#005CB9]" : "border-[#B7B9EA]"}
@@ -236,7 +243,7 @@ const SearchPanel = ({ onSearch }) => {
       </div>
 
       {/* Clear All Button moved outside */}
-      <div className="w-[75%] flex justify-end mt-2">
+      <div className="w-[100%] sm:w-[75%] flex justify-end mt-2 ">
         <button
           onClick={clearAll}
           style={buttonTextStyle}
