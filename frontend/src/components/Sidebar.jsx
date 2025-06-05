@@ -99,13 +99,13 @@ const Sidebar = () => {
                 {mainCategories.map((cat) => (
                   <button
                     key={cat}
-                    className={`w-full px-2 py-1.5 text-md font-semibold rounded-xl text-left transition
+                    className={`w-full px-2 py-3 text-md rounded-xl text-left transition
                       ${selectedCategory === cat ? "bg-[#FFF8EA] text-[#CB3525]" : "bg-transparent text-[#222222]"}
                     `}
                     style={{
                       border: "none",
-                      fontFamily: "'Open Sans', sans-serif",
-                      fontWeight: 600,
+                      fontFamily: "Open Sans, sans-serif",
+                      fontWeight: selectedCategory === cat ? 400 : 600,
                       fontSize: "16px",
                       lineHeight: "100%",
                       letterSpacing: "0%",
@@ -124,14 +124,19 @@ const Sidebar = () => {
                 {childOptions.map((item) => (
                   <button
                     key={item}
-                    className={`text-left full px-2 py-1.5 text-md font-semibold transition rounded-lg 
-                    ${
-                      selectedMain === item
-                        ? "bg-[#FFF8EA] text-[#CB3525]"
-                        : "bg-transparent text-[#222222]"
-                    }`}
+                    className={`text-left full px-2 py-3 text-md transition rounded-lg 
+  ${selectedMain === item
+    ? "bg-[#FFF8EA] text-[#CB3525]"
+    : "bg-transparent text-[#222222]"}
+`}
                     style={{
                       border: "none",
+                      fontFamily: "Open Sans, sans-serif", // <-- Open Sans here
+                      fontWeight: 600,
+                      fontSize: "16px",
+                      lineHeight: "100%",
+                      letterSpacing: "0%",
+                      textTransform: "capitalize",
                     }}
                     onClick={() => setSelectedMain(item)}
                   >
