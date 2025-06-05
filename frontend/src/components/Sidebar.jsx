@@ -148,7 +148,19 @@ const Sidebar = () => {
       {filterSections.map((section) => (
         <div key={section.label} className="mb-2">
           <div className="flex items-center mb-1 relative">
-            <span className="text-xs font-semibold text-[#222222] z-10">{section.label}</span>
+            <span
+              className="text-xs font-semibold text-[#222222] z-10"
+              style={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 500,
+                fontSize: "14px",
+                lineHeight: "100%",
+                letterSpacing: "0%",
+                textTransform: "capitalize",
+              }}
+            >
+              {section.label}
+            </span>
             {/* Divider starts from middle of label, color from Figma (#A6ACE0) */}
             <span
               className="absolute left-1/2 top-1/2"

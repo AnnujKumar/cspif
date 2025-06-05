@@ -20,8 +20,8 @@ const filterChips = [
 ];
 
 const buttonTextStyle = {
-  fontFamily: 'Montserrat, sans-serif',
-  fontWeight: 500,
+  fontFamily: 'Open Sans, sans-serif',
+  fontWeight: 400,
   fontSize: '14px',
   lineHeight: '100%',
   letterSpacing: '0%',
@@ -59,6 +59,7 @@ const CustomDropdown = ({ options, value, onChange }) => {
         style={{
           fontFamily: 'Montserrat, sans-serif',
           fontWeight: 500,
+          fontSize: '14px',
           lineHeight: '100%',
           letterSpacing: '0%',
           textTransform: 'capitalize',
@@ -180,14 +181,21 @@ const SearchPanel = ({ onSearch }) => {
     <div className="w-screen flex flex-col items-center bg-[#f6f8ff] py-6 border border-blue-200 rounded-b-lg px-4">
       {/* Description */}
       <div
-        className="w-full md:w-[75%] mx-auto text-xs text-gray-700 mb-4 px-4  md:text-center sm:text-justify "
-        style={{ fontSize: "14px" }}
+        className="w-full md:w-[80%] mx-auto text-xs text-gray-700 mb-4 px-4 md:text-center sm:text-justify"
+        style={{
+          fontFamily: "Open Sans, sans-serif",
+          fontWeight: 400,
+          fontSize: "14px",
+          lineHeight: "115%",
+          letterSpacing: "1%",
+          textAlign: "center",
+        }}
       >
         CBSI activates CFPIC's vision to support AB 2083 Children, Youth & Families System of Care (CYFSOC) leadership by helping them advance their partnerships across all child and family serving systems, at every level. The goals of CBSI are to enhance the care continuum for children and youth, and particularly those with complex care needs and who are involved in multiple systems.
       </div>
 
       {/* Filters */}
-      <div className="md:w-[75%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3 sm:w-full">
+      <div className="md:w-[80%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3 sm:w-full">
         {/* Dropdowns */}
         <div className="flex gap-4 w-full flex-col sm:flex-row">
           <CustomDropdown options={ageOptions} value={age} onChange={setAge} />
@@ -230,7 +238,7 @@ const SearchPanel = ({ onSearch }) => {
               key={chip}
               style={buttonTextStyle}
               onClick={() => handleFilterSelect(idx)}
-              className={`px-3 py-2 rounded-full border-2 font-medium whitespace-nowrap transition-colors duration-150
+              className={`px-3 py-2 rounded-xl border-2 font-medium whitespace-nowrap transition-colors duration-150
                 ${idx === selectedFilter
                   ? 'bg-[#D14B3A] text-white border-[#D14B3A]'
                   : 'bg-white text-[#222] border-[#E8ECFF] hover:bg-white hover:border-gray-300'
@@ -243,7 +251,7 @@ const SearchPanel = ({ onSearch }) => {
       </div>
 
       {/* Clear All Button moved outside */}
-      <div className="w-[100%] sm:w-[75%] flex justify-end mt-2 ">
+      <div className="w-[100%] sm:w-[80%] flex justify-end mt-2 ">
         <button
           onClick={clearAll}
           style={buttonTextStyle}

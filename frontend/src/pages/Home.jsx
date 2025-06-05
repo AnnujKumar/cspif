@@ -59,7 +59,7 @@ const Home = () => {
       </div>
 
       {/* Search Panel */}
-      <div className="min-w-full sm:px-2">
+      <div className="w-full sm:px-2">
         <SearchPanel onSearch={setFilters} />
       </div>
 
@@ -130,36 +130,7 @@ const Home = () => {
             <div className="relative flex-1 flex flex-col w-full">
               <div className={sidebarOpen ? "transition-all duration-300 relative z-10" : ""}>
                 <ResourceListing services={filteredServices} />
-                <div className="flex justify-end mt-12">
-                  <button
-                    className="bg-[#CB3525] text-white rounded-md px-4 py-2 flex items-center gap-2 font-semibold shadow-sm hover:bg-[#b53e2f] transition"
-                    style={{
-                      boxShadow: "0 1px 2px 0 rgba(16, 24, 40, 0.05)",
-                      border: "none",
-                      fontSize: "14px",
-                      lineHeight: "20px",
-                      minWidth: "auto",
-                      minHeight: "auto",
-                    }}
-                  >
-                    Load More
-                    <span
-                      className="ml-2 flex items-center justify-center"
-                      style={{
-                        background: "rgba(255,255,255,0.10)",
-                        borderRadius: "4px",
-                        border: "1px solid #fff",
-                        width: "20px",
-                        height: "20px",
-                        display: "inline-flex",
-                      }}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 18 18">
-                        <polygon points="6,7 9,12 12,7" fill="#fff" />
-                      </svg>
-                    </span>
-                  </button>
-                </div>
+
               </div>
             </div>
           </div>
