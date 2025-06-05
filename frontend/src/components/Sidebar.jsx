@@ -150,73 +150,103 @@ const Sidebar = () => {
       </div>
 
       {/* Filters */}
-      {filterSections.map((section) => (
-        <div key={section.label} className="mb-2">
-          <div className="flex items-center mb-1 relative">
-            <span
-              className="text-xs font-semibold text-[#222222] z-10"
-              style={{
-                fontFamily: "Montserrat, sans-serif",
-                fontWeight: 500,
-                fontSize: "14px",
-                lineHeight: "100%",
-                letterSpacing: "0%",
-                textTransform: "capitalize",
-              }}
-            >
-              {section.label}
-            </span>
-            {/* Divider starts from middle of label, color from Figma (#A6ACE0) */}
-            <span
-              className="absolute left-1/2 top-1/2"
-              style={{
-                width: "calc(100% - 50%)",
-                height: "1px",
-                backgroundColor: "#A6ACE0",
-                transform: "translateY(-50%)",
-              }}
-            ></span>
-          </div>
-          {/* Service Type */}
-          {section.label === "Service Type" ? (
+      {filterSections.map((section) => {
+        // Create open state for each dropdown
+        const openKey = `${section.label}Open`;
+        const isOpen = section.label === "Service Type" ? serviceTypeOpen : selectedFilters[openKey];
+
+        // Pseudo options for demonstration
+        const pseudoOptions = ["Option 1", "Option 2", "Option 3"];
+        const options = ["All", ...pseudoOptions];
+
+        return (
+          <div key={section.label} className="mb-2">
+            <div className="flex items-center mb-3 relative mt-3">
+              <span
+                className="text-xs font-semibold text-[#222222] z-10"
+                style={{
+                  fontFamily: "Montserrat, sans-serif",
+                  fontWeight: 500,
+                  fontSize: "14px",
+                  lineHeight: "100%",
+                  letterSpacing: "0%",
+                  textTransform: "capitalize",
+                }}
+              >
+                {section.label}
+              </span>
+              <span
+                className="absolute left-1/2 top-1/2"
+                style={{
+                  width: "calc(100% - 50%)",
+                  height: "1px",
+                  backgroundColor: "#A6ACE0",
+                  transform: "translateY(-50%)",
+                }}
+              ></span>
+            </div>
             <div className="bg-[#A6ACE0] rounded-lg">
               <div className="relative mb-2">
                 <button
-                  className="w-full bg-[#FFF8EA] border-none rounded-lg pl-2 py-2 text-md text-[#CB3525] flex items-center justify-between focus:outline-none"
+                  className={`w-full border-none rounded-lg pl-2 py-2 text-md flex items-center justify-between focus:outline-none
+    ${selectedFilters[section.label] === "All" ? "text-white" : "text-[#CB3525]"}
+  `}
                   onClick={() => {
-                    setServiceTypeOpen((prev) => !prev);
-                    setSelectedFilters((prev) => ({
-                      ...prev,
-                      [section.label]: "All",
-                    }));
+                    if (section.label === "Service Type") {
+                      setServiceTypeOpen((prev) => !prev);
+                      setSelectedFilters((prev) => ({
+                        ...prev,
+                        [section.label]: "All",
+                      }));
+                    } else {
+                      setSelectedFilters((prev) => ({
+                        ...prev,
+                        [openKey]: !prev[openKey],
+                        [section.label]: "All",
+                      }));
+                    }
                   }}
                   style={{
                     fontWeight: 400,
+                    background: selectedFilters[section.label] === "All" ? "#7D87CC" : "#FFF8EA",
                   }}
                 >
                   All
                   <span className="ml-2">
-                    {serviceTypeOpen ? (
+                    {(section.label === "Service Type" ? serviceTypeOpen : isOpen) ? (
                       <svg width="22" height="22" viewBox="0 0 22 22">
-                        <polygon points="6,14 11,9 16,14" fill="#7D87CC" />
+                        <polygon
+                          points="6,14 11,9 16,14"
+                          fill={selectedFilters[section.label] !== "All" ? "#515254" : "#FFF8EA"}
+                        />
                       </svg>
                     ) : (
                       <svg width="22" height="22" viewBox="0 0 22 22">
-                        <polygon points="6,9 11,14 16,9" fill="#7D87CC" />
+                        <polygon
+                          points="6,9 11,14 16,9"
+                          fill={selectedFilters[section.label] !== "All" ? "#515254" : "#FFF8EA"}
+                        />
                       </svg>
                     )}
                   </span>
                 </button>
               </div>
-              {serviceTypeOpen && (
+              {isOpen && (
                 <div className="flex flex-col gap-1">
-                  {section.options
+                  {options
                     .filter((option) => option !== "All")
                     .map((option) => (
                       <div
                         key={option}
-                        className="flex items-center justify-between pl-2 py-1.5 text-md text-[#222222] bg-[#A6ACE0] rounded-xl"
+                        className="flex items-center justify-between pl-2 py-1.5 text-md text-[#222222] bg-[#A6ACE0] rounded-xl cursor-pointer"
                         style={{ fontWeight: 400 }}
+                        onClick={() => {
+                          setSelectedFilters((prev) => ({
+                            ...prev,
+                            [section.label]: option,
+                            [openKey]: false,
+                          }));
+                        }}
                       >
                         {option}
                         <FaSearch className="text-[#FFF8EA] text-base mr-2 " />
@@ -225,71 +255,9 @@ const Sidebar = () => {
                 </div>
               )}
             </div>
-          ) : (
-            // Other filters: background starts with dropdown, like Figma
-            <div className="relative">
-              <div className="bg-[#A6ACE0] rounded-lg">
-                <button
-                  type="button"
-                  className={`
-                    w-full bg-[#7D87CC] border-none rounded-lg px-2 py-1.5 text-sm text-[#222222] flex items-center justify-between
-                    focus:outline-none
-                    transition
-                    text-[13px] sm:text-[14px] md:text-[15px]
-                  `}
-                  style={{
-                    fontWeight: 400,
-                    marginTop: "10px",
-                    height: "34px",
-                  }}
-                  onClick={() =>
-                    setSelectedFilters((prev) => ({
-                      ...prev,
-                      [`${section.label}Open`]: !prev[`${section.label}Open`],
-                    }))
-                  }
-                >
-                  {selectedFilters[section.label]}
-                  <span className="ml-2">
-                    <svg width="18" height="18" viewBox="0 0 18 18">
-                      <polygon points="7,10 12,15 17,10" fill="#fff" />
-                    </svg>
-                  </span>
-                </button>
-                {/* Dropdown menu */}
-                {selectedFilters[`${section.label}Open`] && (
-                  <ul
-                    className={`
-                      absolute left-0 mt-1 w-full bg-[#7D87CC] border border-[#B1BBEF] rounded-xl shadow z-50
-                      text-[13px] sm:text-[14px] md:text-[15px]
-                      max-h-40 overflow-y-auto
-                    `}
-                  >
-                    {section.options.map((option) => (
-                      <li
-                        key={option}
-                        className={`
-                          px-3 py-1.5 cursor-pointer hover:bg-blue-100 transition
-                          ${option === selectedFilters[section.label] ? "bg-blue-50 font-semibold" : ""}
-                        `}
-                        onClick={() =>
-                          setSelectedFilters((prev) => ({
-                            ...prev,
-                            [section.label]: option,
-                            [`${section.label}Open`]: false,
-                          }))
-                        }
-                      >
-                        {option}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 };

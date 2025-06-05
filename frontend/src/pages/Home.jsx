@@ -136,7 +136,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div classname="flex min-w-full">
+      <div className="flex min-w-full">
 <Footer />
       </div>
       
