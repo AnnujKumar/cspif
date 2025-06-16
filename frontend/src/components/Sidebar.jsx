@@ -30,6 +30,13 @@ const filterSections = [
   },
 ];
 
+const serviceTypeOptions = [
+  "Tribally Approved Home (TAH)",
+  "Resource Family Approval (RFA)",
+  "Group Home",
+];
+const pseudoOptions = ["Option 1", "Option 2", "Option 3"];
+
 const Sidebar = () => {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -41,7 +48,11 @@ const Sidebar = () => {
     "Partners Involved": "All",
   });
   const [serviceTypeOpen, setServiceTypeOpen] = useState(true);
-
+  const secondOptions = [
+    "Tribally Approved Home (TAH)",
+    "Resource Family Approval (RFA)",
+    "Group Home",
+  ];
   const handleCategoryClick = (cat) => {
     if (selectedCategory === cat) {
       setSelectedCategory(null);
@@ -151,13 +162,14 @@ const Sidebar = () => {
 
       {/* Filters */}
       {filterSections.map((section) => {
+        const isServiceType = section.label === "Service Type";
+        const options = isServiceType
+          ? serviceTypeOptions // Use your real Service Type options here
+          : pseudoOptions;
+
         // Create open state for each dropdown
         const openKey = `${section.label}Open`;
         const isOpen = section.label === "Service Type" ? serviceTypeOpen : selectedFilters[openKey];
-
-        // Pseudo options for demonstration
-        const pseudoOptions = ["Option 1", "Option 2", "Option 3"];
-        const options = ["All", ...pseudoOptions];
 
         return (
           <div key={section.label} className="mb-2">
