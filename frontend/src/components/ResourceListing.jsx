@@ -47,7 +47,7 @@ const ResourceListing = ({ services = [] }) => {
       }}
     >
       {/* Sticky header with title and print button */}
-      <div className="sticky top-0 z-20 bg-white flex items-center justify-between p-4 min-w-full">
+      <div className="sticky top-0 z-20 bg-white flex items-center justify-between p-4 min-w-full rounded-xl">
         <span
           className="font-semibold"
           style={{

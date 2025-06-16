@@ -35,7 +35,16 @@ const serviceTypeOptions = [
   "Resource Family Approval (RFA)",
   "Group Home",
 ];
-const pseudoOptions = ["Option 1", "Option 2", "Option 3"];
+const descriptionOptions = [
+  "High Fidelity Wrap (HFW)",
+  "Child and Family Teams (CFTs)",
+  "Resource Family Approval (RFA)",
+];
+const partnersInvolvedOptions = [
+  "Child Welfare Services (CWS)",
+  "Mental Health Plan (MHP)",
+];
+const eligibilityOptions = ["Option 1", "Option 2", "Option 3"];
 
 const Sidebar = () => {
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -162,12 +171,20 @@ const Sidebar = () => {
 
       {/* Filters */}
       {filterSections.map((section) => {
-        const isServiceType = section.label === "Service Type";
-        const options = isServiceType
-          ? serviceTypeOptions // Use your real Service Type options here
-          : pseudoOptions;
+        let options = [];
+        if (section.label === "Service Type") {
+          options = serviceTypeOptions;
+        } else if (section.label === "Description") {
+          options = descriptionOptions;
+        } else if (section.label === "Partners Involved") {
+          options = partnersInvolvedOptions;
+        } else if (section.label === "Eligibility") {
+          options = eligibilityOptions;
+        } else {
+          options = ["Option 1", "Option 2", "Option 3"];
+        }
 
-        // Create open state for each dropdown
+        const isServiceType = section.label === "Service Type";
         const openKey = `${section.label}Open`;
         const isOpen = section.label === "Service Type" ? serviceTypeOpen : selectedFilters[openKey];
 
