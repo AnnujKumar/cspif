@@ -15,8 +15,17 @@ const insuranceOptions = [
 const cwOptions = ["CW", "Option 1", "Option 2", "Option 3"];
 
 const filterChips = [
-  "All", "MHP", "CWS", "Probation", "Regional Center", "Education",
-  "Child Welfare", "Behavioral Health", "Hyperlink", "Health Plan", "ASAM"
+  "All",
+  "Mental Health Plan (MHP)",
+  "Child Welfare Services (CWS)",
+  "Probation",
+  "Regional Center",
+  "Education",
+  "Child Welfare",
+  "Behavioral Health",
+  "Hyperlink",
+  "Health Plan",
+  "American Society of Addiction Medicine (ASAM)"
 ];
 
 const buttonTextStyle = {
@@ -104,15 +113,148 @@ const CustomDropdown = ({ options, value, onChange }) => {
 };
 
 const SearchPanel = ({ onSearch }) => {
-  // State for selected filter and search input
-  const [selectedFilter, setSelectedFilter] = useState(0); // Default to "All"
+  const [selectedFilter, setSelectedFilter] = useState(0);
   const [searchInput, setSearchInput] = useState('');
-  const [age, setAge] = useState(ageOptions[0]);
-  const [county, setCounty] = useState(countyOptions[0]);
-  const [insurance, setInsurance] = useState(insuranceOptions[0]);
-  const [cw, setCw] = useState(cwOptions[0]);
+  const [age, setAge] = useState([]);
+  const [county, setCounty] = useState([]);
+  const [insurance, setInsurance] = useState([]);
+  const [cw, setCw] = useState([]);
   const [isActive, setIsActive] = useState(false);
   const searchInputRef = useRef();
+
+  // Multi-select dropdown logic
+  const handleMultiSelect = (current, setCurrent, option, defaultOption) => {
+    if (option === defaultOption) {
+      setCurrent([]);
+    } else {
+      setCurrent(prev =>
+        prev.includes(option)
+          ? prev.filter(v => v !== option)
+          : [...prev.filter(v => v !== defaultOption), option]
+      );
+    }
+  };
+
+  // Call onSearch whenever filters change
+  useEffect(() => {
+    if (onSearch) {
+      onSearch({
+        search: searchInput,
+        age,
+        county,
+        insurance,
+        cw,
+        selectedFilter: filterChips[selectedFilter]
+      });
+    }
+    // eslint-disable-next-line
+  }, [searchInput, age, county, insurance, cw, selectedFilter]);
+
+  // Clear all filters and search
+  const clearAll = () => {
+    setSelectedFilter(0);
+    setSearchInput('');
+    setAge([]);
+    setCounty([]);
+    setInsurance([]);
+    setCw([]);
+  };
+
+  // Multi-select dropdown component
+  const MultiSelectDropdown = ({ options, value, setValue, defaultOption }) => {
+    const [open, setOpen] = useState(false);
+    const ref = useRef();
+    useEffect(() => {
+      const handleClick = (e) => {
+        if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      };
+      document.addEventListener("mousedown", handleClick);
+      return () => document.removeEventListener("mousedown", handleClick);
+    }, []);
+    const borderColor = open ? "#005CB9" : "#bfc6ea";
+    return (
+      <div ref={ref} className="relative flex-1">
+        <button
+          type="button"
+          className={`
+            min-w-full rounded-xl bg-white
+            flex justify-between items-center
+            px-3 py-2 text-[14px] sm:text-[14px] md:text-[15px]
+            focus:outline-none whitespace-nowrap min-h-[44px]
+            transition-colors duration-150
+          `}
+          style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 500,
+            fontSize: '14px',
+            lineHeight: '100%',
+            letterSpacing: '0%',
+            textTransform: 'capitalize',
+            border: `2px solid ${borderColor}`,
+          }}
+          onClick={() => setOpen(o => !o)}
+        >
+          <span className="truncate">
+            {value.length === 0 ? defaultOption : value.join(', ')}
+          </span>
+          <span className="ml-2 flex-shrink-0">
+            <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
+              <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
+            </svg>
+          </span>
+        </button>
+        {open && (
+          <ul
+            className={`
+              absolute left-0 mt-1 w-full bg-white border border-[#bfc6ea] rounded-xl shadow z-50
+              text-[13px] sm:text-[14px] md:text-[15px]
+              max-h-56 overflow-y-auto
+            `}
+          >
+            {options.map((opt) => (
+              <li
+                key={opt}
+                className={`
+                  flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-blue-100 transition
+                  border-b border-gray-100
+                  ${value.includes(opt) ? "bg-blue-50 font-semibold" : ""}
+                `}
+                onClick={() => handleMultiSelect(value, setValue, opt, defaultOption)}
+              >
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={value.includes(opt)}
+                    readOnly
+                    className="mr-2 w-5 h-5 accent-blue-500"
+                  />
+                  <span>{opt}</span>
+                </div>
+                {value.includes(opt) && (
+                  <svg
+                    className="text-blue-500"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                  >
+                    <polyline
+                      points="5 11 9 15 15 7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
 
   // Listen for any keydown event and focus the search input
   useEffect(() => {
@@ -135,21 +277,6 @@ const SearchPanel = ({ onSearch }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Send filters to parent whenever any filter/search changes
-  useEffect(() => {
-    if (onSearch) {
-      onSearch({
-        search: searchInput,
-        age,
-        county,
-        insurance,
-        cw,
-        selectedFilter: filterChips[selectedFilter]
-      });
-    }
-    // eslint-disable-next-line
-  }, [searchInput, age, county, insurance, cw, selectedFilter]);
-
   // Handle filter selection
   const handleFilterSelect = (index) => {
     setSelectedFilter(index);
@@ -159,22 +286,21 @@ const SearchPanel = ({ onSearch }) => {
   const clearSearch = () => {
     setSearchInput('');
   };
-  
-  // Clear all filters and search
-  const clearAll = () => {
-    setSelectedFilter(0);
-    setSearchInput('');
-    setAge(ageOptions[0]);
-    setCounty(countyOptions[0]);
-    setInsurance(insuranceOptions[0]);
-    setCw(cwOptions[0]);
-  };
 
-  // Handle Enter key in search bar (optional, but not needed for auto-update)
   const handleSearchKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      // No-op, since filtering is now live
+    if (e.key === "Enter") {
+      // Optionally, you can call onSearch here if you want to trigger search on Enter
+      // onSearch({ search: searchInput, age, county, insurance, cw, selectedFilter: filterChips[selectedFilter] });
+      e.preventDefault();
     }
+  };
+  
+  const partnerFullNames = {
+    TAH: "Tribally Approved Home (TAH)",
+    RFA: "Resource Family Approval (RFA)",
+    CWS: "Child Welfare Services (CWS)",
+    MHP: "Mental Health Plan (MHP)",
+    ASAM: "American Society of Addiction Medicine (ASAM)",
   };
 
   return (
@@ -198,10 +324,10 @@ const SearchPanel = ({ onSearch }) => {
       <div className="md:w-[80%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3 sm:w-full">
         {/* Dropdowns */}
         <div className="flex gap-4 w-full flex-col sm:flex-row">
-          <CustomDropdown options={ageOptions} value={age} onChange={setAge} />
-          <CustomDropdown options={countyOptions} value={county} onChange={setCounty} />
-          <CustomDropdown options={insuranceOptions} value={insurance} onChange={setInsurance} />
-          <CustomDropdown options={cwOptions} value={cw} onChange={setCw} />
+          <MultiSelectDropdown options={ageOptions} value={age} setValue={setAge} defaultOption="Age" />
+          <MultiSelectDropdown options={countyOptions} value={county} setValue={setCounty} defaultOption="County" />
+          <MultiSelectDropdown options={insuranceOptions} value={insurance} setValue={setInsurance} defaultOption="Insurance" />
+          <MultiSelectDropdown options={cwOptions} value={cw} setValue={setCw} defaultOption="CW" />
         </div>
         {/* Search Bar */}
         <div className={`flex items-center rounded-lg px-4 py-4 bg-white transition-all duration-150

@@ -21,8 +21,7 @@ const Header = () => {
               color: '#606060'
             }}
           >
-            HNY CONTINUUM OF
-            CARE <br className="block md:hidden" />RESOURCE
+            System of Care Coordination <br className="block md:hidden" />Tool
           </h1>
         </div>
       </header>

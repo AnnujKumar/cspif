@@ -39,13 +39,15 @@ const Home = () => {
         service.title.toLowerCase().includes(search) ||
         service.description.toLowerCase().includes(search);
 
-      // Dropdown filters (skip if default selected)
-      const matchesAge = !filters.age || filters.age === "Age" || service.age === filters.age;
-      const matchesCounty = !filters.county || filters.county === "County" || service.county === filters.county;
-      const matchesInsurance = !filters.insurance || filters.insurance === "Insurance" || service.insurance === filters.insurance;
-      const matchesCw = !filters.cw || filters.cw === "CW" || service.cw === filters.cw;
-
-      // You can add more filter logic for selectedFilter if needed
+      // Multi-select filters
+      const matchesAge =
+        !filters.age || filters.age.length === 0 || filters.age.includes("Age") || filters.age.includes(service.age);
+      const matchesCounty =
+        !filters.county || filters.county.length === 0 || filters.county.includes("County") || filters.county.includes(service.county);
+      const matchesInsurance =
+        !filters.insurance || filters.insurance.length === 0 || filters.insurance.includes("Insurance") || filters.insurance.includes(service.insurance);
+      const matchesCw =
+        !filters.cw || filters.cw.length === 0 || filters.cw.includes("CW") || filters.cw.includes(service.cw);
 
       return matchesSearch && matchesAge && matchesCounty && matchesInsurance && matchesCw;
     });
@@ -127,7 +129,7 @@ const Home = () => {
               </div>
             )}
             {/* Resource Listing */}
-            <div className="relative flex-1 flex flex-col w-full">
+            <div className="relative flex-1 flex flex-col w-full overflow-x-auto overflow-y-hidden">
               <div className={sidebarOpen ? "transition-all duration-300 relative z-10" : ""}>
                 <ResourceListing services={filteredServices} />
 

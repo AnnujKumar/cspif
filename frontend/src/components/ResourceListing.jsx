@@ -14,6 +14,14 @@ const partnerColors = {
   // fallback color will be used if not found
 };
 
+const partnerFullNames = {
+  TAH: "Tribally Approved Home (TAH)",
+  RFA: "Resource Family Approval (RFA)",
+  CWS: "Child Welfare Services (CWS)",
+  MHP: "Mental Health Plan (MHP)",
+  ASAM: "American Society of Addiction Medicine (ASAM)",
+};
+
 const INITIAL_ROWS = 5;
 const LOAD_MORE_COUNT = 5;
 
@@ -29,7 +37,7 @@ const ResourceListing = ({ services = [] }) => {
 
   return (
     <div
-      className="flex flex-col flex-1 bg-white rounded-xl border border-[#bfc6ea] p-0 overflow-x-auto scroll"
+      className="flex flex-col flex-1 bg-white rounded-xl border border-[#bfc6ea] p-0  scroll w-full"
       style={{
         // Remove fixed height and scrolling for natural expansion
         // height: "75vh",
@@ -39,7 +47,7 @@ const ResourceListing = ({ services = [] }) => {
       }}
     >
       {/* Sticky header with title and print button */}
-      <div className="sticky top-0 z-20 bg-white flex items-center justify-between p-4">
+      <div className="sticky top-0 z-20 bg-white flex items-center justify-between p-4 min-w-full">
         <span
           className="font-semibold"
           style={{
@@ -60,8 +68,15 @@ const ResourceListing = ({ services = [] }) => {
         </button>
       </div>
       {/* Table */}
-      <div className="w-full overflow-x-auto">
-        <table className="w-full min-w-[700px] text-sm border-separate table-fixed scroll" style={{ borderSpacing: "0 4px" }}>
+      <div className="w-full overflow-x-auto" style={{ minHeight: "300px" }}>
+        <table
+          className="w-full min-w-[700px] text-sm border-separate table-fixed scroll"
+          style={{
+            borderSpacing: "0 4px",
+            minWidth: "700px",
+            width: "auto",
+          }}
+        >
           <colgroup>
             <col style={{ width: "16%" }} />
             <col style={{ width: "28%" }} />
@@ -141,7 +156,7 @@ const ResourceListing = ({ services = [] }) => {
           <tbody>
             {services.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-8 text-gray-400">
+                <td colSpan={6} className="text-center py-8 text-gray-400" style={{ height: "200px", minWidth: "100%" }}>
                   No resources found.
                 </td>
               </tr>
@@ -252,7 +267,7 @@ const ResourceListing = ({ services = [] }) => {
         key={p + i}
         className={`inline-block px-2 py-1 rounded-lg text-xs font-semibold ${partnerColors[p] || "bg-[#8185E7] text-white"}`}
       >
-        {p}
+        {partnerFullNames[p] || p}
       </span>
     ))}
   </div>
