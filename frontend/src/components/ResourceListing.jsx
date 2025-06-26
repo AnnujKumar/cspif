@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 
-// Partner badge color mapping (only 3 allowed colors)
-const partnerColors = {
-  CWS: "bg-[#8185E7] text-white",
-  Probation: "bg-[#FF5B5B] text-white",
-  "County Mental": "bg-[#40B5E3] text-white",
-  "Health Plan": "bg-[#8185E7] text-white",
-  "Mental Health Plan (MHP)": "bg-[#FF5B5B] text-white",
-  "County SUD": "bg-[#40B5E3] text-white",
-  "Child Welfare": "bg-[#8185E7] text-white",
-  "County Mental Health Plan": "bg-[#FF5B5B] text-white",
-  "Other": "bg-[#40B5E3] text-white",
-  // fallback color will be used if not found
+// Partner badge color mapping (cycling through 3 colors to avoid repetition)
+const partnerColorCycle = [
+  "bg-[#8185E7] text-white",
+  "bg-[#FF5B5B] text-white", 
+  "bg-[#40B5E3] text-white"
+];
+
+// Function to get color based on index to ensure no repeated colors in the same row
+const getPartnerColor = (index) => {
+  return partnerColorCycle[index % partnerColorCycle.length];
 };
 
 const partnerFullNames = {
@@ -265,7 +263,7 @@ const ResourceListing = ({ services = [] }) => {
     {(res.partners || []).map((p, i) => (
       <span
         key={p + i}
-        className={`inline-block px-2 py-1 rounded-lg text-xs font-semibold ${partnerColors[p] || "bg-[#8185E7] text-white"}`}
+        className={`inline-block px-2 py-1 rounded-lg text-xs font-semibold ${getPartnerColor(i)}`}
       >
         {partnerFullNames[p] || p}
       </span>
