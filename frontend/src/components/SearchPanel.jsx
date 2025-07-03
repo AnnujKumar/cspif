@@ -78,9 +78,11 @@ const CustomDropdown = ({ options, value, onChange }) => {
       >
         <span className="truncate">{value}</span>
         <span className="ml-2 flex-shrink-0">
-          <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
-            <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
-          </svg>
+          <div className={`transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+            <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
+              <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
+            </svg>
+          </div>
         </span>
       </button>
       {open && (
@@ -121,6 +123,149 @@ const SearchPanel = ({ onSearch }) => {
   const [cw, setCw] = useState([]);
   const [isActive, setIsActive] = useState(false);
   const searchInputRef = useRef();
+
+  // Decision Tree state
+  const [decisionTreeOpen, setDecisionTreeOpen] = useState(false);
+  const [expandedQuestions, setExpandedQuestions] = useState({});
+  const [decisionTreeAnswers, setDecisionTreeAnswers] = useState({});
+
+  // Decision Tree data
+  const decisionTreeQuestions = [
+    {
+      id: 1,
+      category: "Demographic",
+      question: "What system are you affiliated with?",
+      options: [
+        "CWS",
+        "BH",
+        "Education",
+        "Probation",
+        "Regional center",
+        "Community partner",
+        "Other"
+      ]
+    },
+    {
+      id: 2,
+      category: "Demographic",
+      question: "What role do you most closely identify with?",
+      options: [
+        "Direct Services",
+        "Leadership/Management",
+        "Fiscal",
+        "Other"
+      ]
+    },
+    {
+      id: 3,
+      category: "Funnels",
+      question: "If you would like child-specific resources, please select from the following resource choices, or if looking for general system information, go to the next question. Select all that apply.",
+      options: [
+        "Services",
+        "Placement options"
+      ],
+      multiSelect: true,
+      hasSubQuestions: true
+    },
+    {
+      id: 3.1,
+      parentId: 3,
+      question: "What systems already serve the youth, or what systems would the youth be eligible for? Select all that apply.",
+      options: [
+        "CWS",
+        "BH",
+        "Regional Center",
+        "Probation",
+        "Education"
+      ],
+      multiSelect: true,
+      showWhen: (answers) => {
+        const parentAnswers = answers[3] || [];
+        return parentAnswers.length > 0 && (parentAnswers.includes("Services") || parentAnswers.includes("Placement options"));
+      }
+    },
+    {
+      id: 3.2,
+      parentId: 3,
+      question: "What complex needs does the youth have? Select all that apply.",
+      options: [
+        "Developmental needs",
+        "Behavioral health needs",
+        "Education needs",
+        "Substance use disorder(s)",
+        "CSEC",
+        "Placement disruption"
+      ],
+      multiSelect: true,
+      showWhen: (answers) => {
+        const parentAnswers = answers[3] || [];
+        return parentAnswers.length > 0 && (parentAnswers.includes("Services") || parentAnswers.includes("Placement options"));
+      }
+    },
+    {
+      id: 4,
+      category: "Funnels",
+      question: "If you would like more information about system partner placements and services, please identify which system and which resource you would like to learn more about. Select all that apply.",
+      options: [
+        "CW",
+        "BH",
+        "Education",
+        "Probation",
+        "Regional center"
+      ],
+      multiSelect: true,
+      hasSubQuestions: true
+    },
+    {
+      id: 4.1,
+      parentId: 4,
+      question: "Would you like to know more about services and/or supports from the systems selected? Select all that apply.",
+      options: [
+        "Services",
+        "Placement options"
+      ],
+      multiSelect: true,
+      showWhen: (answers) => {
+        const parentAnswers = answers[4] || [];
+        return parentAnswers.length > 0;
+      }
+    }
+  ];
+
+  // Toggle decision tree visibility
+  const toggleDecisionTree = () => {
+    setDecisionTreeOpen(!decisionTreeOpen);
+  };
+
+  // Toggle question expansion
+  const toggleQuestion = (questionId) => {
+    setExpandedQuestions(prev => ({
+      ...prev,
+      [questionId]: !prev[questionId]
+    }));
+  };
+
+  // Handle answer selection
+  const handleAnswerSelect = (questionId, option, isMultiSelect = false) => {
+    if (isMultiSelect) {
+      setDecisionTreeAnswers(prev => {
+        const currentAnswers = prev[questionId] || [];
+        const isSelected = currentAnswers.includes(option);
+        
+        return {
+          ...prev,
+          [questionId]: isSelected 
+            ? currentAnswers.filter(answer => answer !== option)
+            : [...currentAnswers, option]
+        };
+      });
+    } else {
+      setDecisionTreeAnswers(prev => ({
+        ...prev,
+        [questionId]: option
+      }));
+    }
+  };
 
   // Multi-select dropdown logic
   const handleMultiSelect = (current, setCurrent, option, defaultOption) => {
@@ -198,9 +343,11 @@ const SearchPanel = ({ onSearch }) => {
             {value.length === 0 ? defaultOption : value.join(', ')}
           </span>
           <span className="ml-2 flex-shrink-0">
-            <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
-              <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
-            </svg>
+            <div className={`transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
+              <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
+                <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
+              </svg>
+            </div>
           </span>
         </button>
         {open && (
@@ -303,6 +450,156 @@ const SearchPanel = ({ onSearch }) => {
     ASAM: "American Society of Addiction Medicine (ASAM)",
   };
 
+  // Decision Tree Component
+  const DecisionTree = () => (
+    <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen mb-6">
+      {/* Decision Tree Header */}
+      <div 
+        className="flex items-center justify-center p-4 cursor-pointer bg-[#E2E4FB] relative"
+        onClick={toggleDecisionTree}
+      >
+        <h3 
+          className="text-[#333]" 
+          style={{ 
+            fontFamily: 'Open Sans, sans-serif',
+            fontWeight: 600,
+            fontSize: '20px',
+            lineHeight: '100%',
+            letterSpacing: '0%',
+            textTransform: 'uppercase'
+          }}
+        >
+          DECISION TREE
+        </h3>
+        <div className="ml-5">
+          <div className={`transform transition-transform duration-200 ${decisionTreeOpen ? '' : 'rotate-180'}`}>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21.7852 19H10.1955C9.13619 19 8.5754 17.7102 9.38544 16.9731L15.2426 11.3225C15.7411 10.8925 16.4888 10.8925 16.925 11.3225L22.6576 16.9731C23.4053 17.7102 22.8445 19 21.7852 19Z" fill="#015AB8"/>
+              <path d="M16 31C7.73077 31 1 24.2692 1 16C1 7.73077 7.73077 1 16 1C24.2692 1 31 7.73077 31 16C31 24.2692 24.2692 31 16 31ZM16 1.76923C8.15385 1.76923 1.76923 8.15385 1.76923 16C1.76923 23.8462 8.15385 30.2308 16 30.2308C23.8462 30.2308 30.2308 23.8462 30.2308 16C30.2308 8.15385 23.8462 1.76923 16 1.76923Z" fill="#015AB8"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Decision Tree Content */}
+      {decisionTreeOpen && (
+        <div className="bg-white px-6 py-6">
+          <div className="max-w-6xl mx-auto space-y-4">
+            {decisionTreeQuestions
+              .filter(q => {
+                if (!q.parentId) return true;
+                if (q.showWhen) return q.showWhen(decisionTreeAnswers);
+                return true;
+              })
+              .map((q, index) => {
+                const mainQuestions = decisionTreeQuestions.filter(question => !question.parentId);
+                const questionNumber = q.parentId 
+                  ? `${q.parentId}.${q.id.toString().split('.')[1]}` 
+                  : mainQuestions.findIndex(mainQ => mainQ.id === q.id) + 1;
+                
+                return (
+                  <div key={q.id} className={`${q.parentId ? 'ml-8' : ''}`}>
+                    {/* Question Container - includes both header and options */}
+                    <div 
+                      className={`transition-all duration-200 ${
+                        expandedQuestions[q.id] 
+                          ? 'bg-[#E2E4FB] border-2 border-[#3B82F6] rounded-lg' 
+                          : 'bg-transparent'
+                      }`}
+                    >
+                      {/* Question Header */}
+                      <div 
+                        className="flex items-start justify-between p-4 cursor-pointer"
+                        onClick={() => toggleQuestion(q.id)}
+                      >
+                        <div className="flex-1">
+                          <span 
+                            className="text-[#333]" 
+                            style={{ 
+                              fontFamily: 'Open Sans, sans-serif',
+                              fontWeight: 400,
+                              fontSize: '18px',
+                              lineHeight: '115%',
+                              letterSpacing: '1%'
+                            }}
+                          >
+                            {questionNumber}. {q.question}
+                          </span>
+                        </div>
+                        <div className={`transform transition-transform duration-200 ml-4 flex-shrink-0 ${expandedQuestions[q.id] ? '' : 'rotate-180'}`}>
+                          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 7.38086L8 -0.000279427L16 7.38086H0Z" fill="#3F5590"/>
+                          </svg>
+                        </div>
+                      </div>
+
+                      {/* Question Options - within the same container */}
+                      {expandedQuestions[q.id] && (
+                        <div className="px-4 pb-4">
+                          <div className="flex flex-wrap gap-6">
+                            {q.options.map((option, optionIndex) => {
+                              const isSelected = q.multiSelect 
+                                ? (decisionTreeAnswers[q.id] || []).includes(option)
+                                : decisionTreeAnswers[q.id] === option;
+                              
+                              return (
+                                <div 
+                                  key={optionIndex}
+                                  className="flex items-center"
+                                >
+                                  <div 
+                                    className="flex items-center cursor-pointer"
+                                    onClick={() => handleAnswerSelect(q.id, option, q.multiSelect)}
+                                  >
+                                    {q.multiSelect ? (
+                                      // Checkbox for multi-select
+                                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mr-3 transition-colors ${
+                                        isSelected 
+                                          ? 'bg-[#3B82F6] border-[#3B82F6]' 
+                                          : 'bg-white border-[#CBD5E1]'
+                                      }`}>
+                                        {isSelected && (
+                                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                            <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                          </svg>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      // Radio button for single select
+                                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-colors ${
+                                        isSelected 
+                                          ? 'bg-white border-[#E53E3E]' 
+                                          : 'bg-white border-[#CBD5E1]'
+                                      }`}>
+                                        {/* Grey dot when not selected, red dot when selected */}
+                                        <div className={`w-3 h-3 rounded-full ${
+                                          isSelected 
+                                            ? 'bg-[#E53E3E]' 
+                                            : 'bg-[#CBD5E1]'
+                                        }`}>
+                                        </div>
+                                      </div>
+                                    )}
+                                    <span className="text-[15px] text-[#333] select-none" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                                      {option}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="w-screen flex flex-col items-center bg-[#f6f8ff] py-6 border border-blue-200 rounded-b-lg px-4">
       {/* Description */}
@@ -318,6 +615,11 @@ const SearchPanel = ({ onSearch }) => {
         }}
       >
         CBSI activates CFPIC's vision to support AB 2083 Children, Youth & Families System of Care (CYFSOC) leadership by helping them advance their partnerships across all child and family serving systems, at every level. The goals of CBSI are to enhance the care continuum for children and youth, and particularly those with complex care needs and who are involved in multiple systems.
+      </div>
+
+      {/* Decision Tree */}
+      <div className="w-full md:w-[80%] mb-4">
+        <DecisionTree />
       </div>
 
       {/* Filters */}
