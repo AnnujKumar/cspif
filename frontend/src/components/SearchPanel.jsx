@@ -3,7 +3,6 @@ import { FaSearch } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
 
 // Example options
-const ageOptions = ["Age", "0-5", "6-12", "13-17", "18+"];
 const countyOptions = ["County", "Alameda", "Los Angeles", "Sacramento", "San Diego"];
 const insuranceOptions = [
   "Insurance",                             
@@ -12,20 +11,15 @@ const insuranceOptions = [
   "MediCal FFS",
   "Other"
 ];
-const cwOptions = ["CW", "Option 1", "Option 2", "Option 3"];
+const cwOptions = ["Child Welfare", "Option 1", "Option 2", "Option 3"];
 
 const filterChips = [
   "All",
-  "Mental Health Plan (MHP)",
-  "Child Welfare Services (CWS)",
+  "Child Welfare (CW)",
   "Probation",
-  "Regional Center",
-  "Education",
-  "Child Welfare",
-  "Behavioral Health",
-  "Hyperlink",
-  "Health Plan",
-  "American Society of Addiction Medicine (ASAM)"
+  "Behavioral Health (BH)",
+  "Developmental Services",
+  "Education"
 ];
 
 const buttonTextStyle = {
@@ -117,7 +111,6 @@ const CustomDropdown = ({ options, value, onChange }) => {
 const SearchPanel = ({ onSearch }) => {
   const [selectedFilter, setSelectedFilter] = useState(0);
   const [searchInput, setSearchInput] = useState('');
-  const [age, setAge] = useState([]);
   const [county, setCounty] = useState([]);
   const [insurance, setInsurance] = useState([]);
   const [cw, setCw] = useState([]);
@@ -136,8 +129,8 @@ const SearchPanel = ({ onSearch }) => {
       category: "Demographic",
       question: "What system are you affiliated with?",
       options: [
-        "CWS",
-        "BH",
+        "Child Welfare Services (CWS)",
+        "Behavioral Health (BH)",
         "Education",
         "Probation",
         "Regional center",
@@ -159,35 +152,32 @@ const SearchPanel = ({ onSearch }) => {
     {
       id: 3,
       category: "Funnels",
-      question: "If you would like child-specific resources, please select from the following resource choices, or if looking for general system information, go to the next question. Select all that apply.",
+      question: "If you would like child-specific resources, please select from the following resource choices, or if looking for general system information, go to the next question.",
       options: [
         "Services",
         "Placement options"
       ],
-      multiSelect: true,
       hasSubQuestions: true
     },
     {
       id: 3.1,
       parentId: 3,
-      question: "What systems already serve the youth, or what systems would the youth be eligible for? Select all that apply.",
+      question: "What systems already serve the youth, or what systems would the youth be eligible for?",
       options: [
-        "CWS",
-        "BH",
+        "Child Welfare Services (CWS)",
+        "Behavioral Health (BH)",
         "Regional Center",
         "Probation",
         "Education"
       ],
-      multiSelect: true,
       showWhen: (answers) => {
-        const parentAnswers = answers[3] || [];
-        return parentAnswers.length > 0 && (parentAnswers.includes("Services") || parentAnswers.includes("Placement options"));
+        return answers[3] === "Services" || answers[3] === "Placement options";
       }
     },
     {
       id: 3.2,
       parentId: 3,
-      question: "What complex needs does the youth have? Select all that apply.",
+      question: "What complex needs does the youth have?",
       options: [
         "Developmental needs",
         "Behavioral health needs",
@@ -196,38 +186,33 @@ const SearchPanel = ({ onSearch }) => {
         "CSEC",
         "Placement disruption"
       ],
-      multiSelect: true,
       showWhen: (answers) => {
-        const parentAnswers = answers[3] || [];
-        return parentAnswers.length > 0 && (parentAnswers.includes("Services") || parentAnswers.includes("Placement options"));
+        return answers[3] === "Services" || answers[3] === "Placement options";
       }
     },
     {
       id: 4,
       category: "Funnels",
-      question: "If you would like more information about system partner placements and services, please identify which system and which resource you would like to learn more about. Select all that apply.",
+      question: "If you would like more information about system partner placements and services, please identify which system and which resource you would like to learn more about.",
       options: [
-        "CW",
-        "BH",
+        "Child Welfare",
+        "Behavioral Health (BH)",
         "Education",
         "Probation",
         "Regional center"
       ],
-      multiSelect: true,
       hasSubQuestions: true
     },
     {
       id: 4.1,
       parentId: 4,
-      question: "Would you like to know more about services and/or supports from the systems selected? Select all that apply.",
+      question: "Would you like to know more about services and/or supports from the systems selected?",
       options: [
         "Services",
         "Placement options"
       ],
-      multiSelect: true,
       showWhen: (answers) => {
-        const parentAnswers = answers[4] || [];
-        return parentAnswers.length > 0;
+        return answers[4] && answers[4] !== "";
       }
     }
   ];
@@ -245,26 +230,24 @@ const SearchPanel = ({ onSearch }) => {
     }));
   };
 
-  // Handle answer selection
-  const handleAnswerSelect = (questionId, option, isMultiSelect = false) => {
-    if (isMultiSelect) {
-      setDecisionTreeAnswers(prev => {
-        const currentAnswers = prev[questionId] || [];
-        const isSelected = currentAnswers.includes(option);
-        
+  // Handle answer selection - allow toggle functionality
+  const handleAnswerSelect = (questionId, option) => {
+    setDecisionTreeAnswers(prev => {
+      const currentAnswer = prev[questionId];
+      
+      // If the same option is clicked again, unselect it
+      if (currentAnswer === option) {
+        const newAnswers = { ...prev };
+        delete newAnswers[questionId]; // Remove the answer completely
+        return newAnswers;
+      } else {
+        // Otherwise, select the new option
         return {
           ...prev,
-          [questionId]: isSelected 
-            ? currentAnswers.filter(answer => answer !== option)
-            : [...currentAnswers, option]
+          [questionId]: option
         };
-      });
-    } else {
-      setDecisionTreeAnswers(prev => ({
-        ...prev,
-        [questionId]: option
-      }));
-    }
+      }
+    });
   };
 
   // Multi-select dropdown logic
@@ -285,7 +268,6 @@ const SearchPanel = ({ onSearch }) => {
     if (onSearch) {
       onSearch({
         search: searchInput,
-        age,
         county,
         insurance,
         cw,
@@ -293,13 +275,12 @@ const SearchPanel = ({ onSearch }) => {
       });
     }
     // eslint-disable-next-line
-  }, [searchInput, age, county, insurance, cw, selectedFilter]);
+  }, [searchInput, county, insurance, cw, selectedFilter]);
 
   // Clear all filters and search
   const clearAll = () => {
     setSelectedFilter(0);
     setSearchInput('');
-    setAge([]);
     setCounty([]);
     setInsurance([]);
     setCw([]);
@@ -538,9 +519,7 @@ const SearchPanel = ({ onSearch }) => {
                         <div className="px-4 pb-4">
                           <div className="flex flex-wrap gap-6">
                             {q.options.map((option, optionIndex) => {
-                              const isSelected = q.multiSelect 
-                                ? (decisionTreeAnswers[q.id] || []).includes(option)
-                                : decisionTreeAnswers[q.id] === option;
+                              const isSelected = decisionTreeAnswers[q.id] === option;
                               
                               return (
                                 <div 
@@ -549,37 +528,22 @@ const SearchPanel = ({ onSearch }) => {
                                 >
                                   <div 
                                     className="flex items-center cursor-pointer"
-                                    onClick={() => handleAnswerSelect(q.id, option, q.multiSelect)}
+                                    onClick={() => handleAnswerSelect(q.id, option)}
                                   >
-                                    {q.multiSelect ? (
-                                      // Checkbox for multi-select
-                                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mr-3 transition-colors ${
+                                    {/* Radio button for all questions */}
+                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-colors ${
+                                      isSelected 
+                                        ? 'bg-white border-[#E53E3E]' 
+                                        : 'bg-white border-[#CBD5E1]'
+                                    }`}>
+                                      {/* Grey dot when not selected, red dot when selected */}
+                                      <div className={`w-3 h-3 rounded-full ${
                                         isSelected 
-                                          ? 'bg-[#3B82F6] border-[#3B82F6]' 
-                                          : 'bg-white border-[#CBD5E1]'
+                                          ? 'bg-[#E53E3E]' 
+                                          : 'bg-[#CBD5E1]'
                                       }`}>
-                                        {isSelected && (
-                                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                            <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                          </svg>
-                                        )}
                                       </div>
-                                    ) : (
-                                      // Radio button for single select
-                                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-colors ${
-                                        isSelected 
-                                          ? 'bg-white border-[#E53E3E]' 
-                                          : 'bg-white border-[#CBD5E1]'
-                                      }`}>
-                                        {/* Grey dot when not selected, red dot when selected */}
-                                        <div className={`w-3 h-3 rounded-full ${
-                                          isSelected 
-                                            ? 'bg-[#E53E3E]' 
-                                            : 'bg-[#CBD5E1]'
-                                        }`}>
-                                        </div>
-                                      </div>
-                                    )}
+                                    </div>
                                     <span className="text-[15px] text-[#333] select-none" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                                       {option}
                                     </span>
@@ -624,13 +588,13 @@ const SearchPanel = ({ onSearch }) => {
 
       {/* Filters */}
       <div className="md:w-[80%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3 sm:w-full">
-        {/* Dropdowns */}
+        {/* Dropdowns - remove Age dropdown */}
         <div className="flex gap-4 w-full flex-col sm:flex-row">
-          <MultiSelectDropdown options={ageOptions} value={age} setValue={setAge} defaultOption="Age" />
           <MultiSelectDropdown options={countyOptions} value={county} setValue={setCounty} defaultOption="County" />
           <MultiSelectDropdown options={insuranceOptions} value={insurance} setValue={setInsurance} defaultOption="Insurance" />
-          <MultiSelectDropdown options={cwOptions} value={cw} setValue={setCw} defaultOption="CW" />
+          <MultiSelectDropdown options={cwOptions} value={cw} setValue={setCw} defaultOption="Child Welfare" />
         </div>
+        
         {/* Search Bar */}
         <div className={`flex items-center rounded-lg px-4 py-4 bg-white transition-all duration-150
           ${isActive ? "border-[#005CB9]" : "border-[#B7B9EA]"}
@@ -660,7 +624,7 @@ const SearchPanel = ({ onSearch }) => {
         </div>
 
         {/* Filter Chips */}
-        <div className="flex flex-wrap overflow-x-auto gap-2 mt-1 pb-2">
+        <div className="flex flex-wrap justify-center gap-2 mt-1 pb-2">
           {filterChips.map((chip, idx) => (
             <button
               key={chip}
