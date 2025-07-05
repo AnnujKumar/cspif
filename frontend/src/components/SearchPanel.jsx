@@ -121,6 +121,11 @@ const SearchPanel = ({ onSearch }) => {
   const [decisionTreeOpen, setDecisionTreeOpen] = useState(false);
   const [expandedQuestions, setExpandedQuestions] = useState({});
   const [decisionTreeAnswers, setDecisionTreeAnswers] = useState({});
+  
+  // Dialog state for "Other" option
+  const [showOtherDialog, setShowOtherDialog] = useState(false);
+  const [currentQuestionId, setCurrentQuestionId] = useState(null);
+  const [otherInputValue, setOtherInputValue] = useState('');
 
   // Decision Tree data
   const decisionTreeQuestions = [
@@ -232,6 +237,17 @@ const SearchPanel = ({ onSearch }) => {
 
   // Handle answer selection - allow toggle functionality
   const handleAnswerSelect = (questionId, option) => {
+    // If "Other" is selected, show inline input
+    if (option === "Other") {
+      setCurrentQuestionId(questionId);
+      setOtherInputValue('');
+      setDecisionTreeAnswers(prev => ({
+        ...prev,
+        [questionId]: option
+      }));
+      return;
+    }
+
     setDecisionTreeAnswers(prev => {
       const currentAnswer = prev[questionId];
       
@@ -248,6 +264,26 @@ const SearchPanel = ({ onSearch }) => {
         };
       }
     });
+  };
+
+  // Handle "Other" dialog submission
+  const handleOtherSubmit = () => {
+    if (otherInputValue.trim()) {
+      setDecisionTreeAnswers(prev => ({
+        ...prev,
+        [currentQuestionId]: `Other: ${otherInputValue.trim()}`
+      }));
+    }
+    setShowOtherDialog(false);
+    setCurrentQuestionId(null);
+    setOtherInputValue('');
+  };
+
+  // Handle "Other" dialog cancel
+  const handleOtherCancel = () => {
+    setShowOtherDialog(false);
+    setCurrentQuestionId(null);
+    setOtherInputValue('');
   };
 
   // Multi-select dropdown logic
@@ -519,7 +555,8 @@ const SearchPanel = ({ onSearch }) => {
                         <div className="px-4 pb-4">
                           <div className="flex flex-wrap gap-6">
                             {q.options.map((option, optionIndex) => {
-                              const isSelected = decisionTreeAnswers[q.id] === option;
+                              const isSelected = decisionTreeAnswers[q.id] === option || 
+                                                (option === "Other" && decisionTreeAnswers[q.id]?.startsWith("Other:"));
                               
                               return (
                                 <div 
@@ -545,9 +582,33 @@ const SearchPanel = ({ onSearch }) => {
                                       </div>
                                     </div>
                                     <span className="text-[15px] text-[#333] select-none" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                                      {option}
+                                      {option === "Other" && decisionTreeAnswers[q.id]?.startsWith("Other:") 
+                                        ? decisionTreeAnswers[q.id] 
+                                        : option}
                                     </span>
                                   </div>
+                                  
+                                  {/* Inline input for "Other" option */}
+                                  {option === "Other" && isSelected && (
+                                    <input
+                                      type="text"
+                                      value={otherInputValue}
+                                      onChange={(e) => setOtherInputValue(e.target.value)}
+                                      onBlur={handleOtherSubmit}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          handleOtherSubmit();
+                                        } else if (e.key === 'Escape') {
+                                          handleOtherCancel();
+                                        }
+                                      }}
+                                      placeholder="Specify..."
+                                      className="ml-3 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
+                                      style={{ fontFamily: 'Open Sans, sans-serif' }}
+                                      autoFocus
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                  )}
                                 </div>
                               );
                             })}

@@ -66,68 +66,8 @@ const Home = () => {
       </div>
 
       {/* Main content area with blur overlay when sidebarOpen */}
-      <div className="relative w-full flex-1">
-        {sidebarOpen && (
-          <div
-            className="absolute inset-0 z-40 pointer-events-none"
-            style={{
-              background: "rgba(120,130,150,0.35)",
-              backdropFilter: "blur(4px)",
-              WebkitBackdropFilter: "blur(4px)",
-            }}
-          />
-        )}
-        <div className={
-            sidebarOpen
-              ? "flex w-full max-w-none gap-4 pl-2 pr-0 pb-6 mt-2 relative"
-              : "flex w-full  mx-auto gap-4 px-2 pb-6 mt-2 relative"
-          }
-        >
-          {/* Desktop Sidebar (1025px and up) */}
-          <div className={`hidden lg:block min-w-[220px]${sidebarOpen ? " lg:hidden" : ""}`}>
-            <Sidebar />
-          </div>
-          {/* Tablet Sidebar Button (between 640px and 1024px) */}
-          <div className="hidden sm:flex lg:hidden items-start">
-            {!sidebarOpen && (
-              <SidebarButton onClick={() => setSidebarOpen(true)} />
-            )}
-          </div>
-          {/* Resource List and Drawer Sidebar */}
-          <div className={`flex-1 flex flex-col relative${sidebarOpen ? " w-full" : ""}`}>
-            {/* Tablet Sidebar Drawer */}
-            {sidebarOpen && (
-              <div
-                className="absolute top-0 left-0 z-50 sm:block lg:hidden hidden
-                  rounded-tr-2xl rounded-2xl shadow-2xl flex flex-col"
-                style={{
-                  width: "max-content",
-                  minWidth: "220px",
-                  maxWidth: "320px",
-                  height: "max-content",
-                  background: "linear-gradient(to bottom, #2563eb 0%, #2563eb 60%, #3576f6 100%)",
-                  boxShadow: "4px 0 24px 0 rgba(0,0,0,0.10)",
-                  transition: "transform 0.3s",
-                  transform: sidebarOpen ? "translateX(0)" : "translateX(-110%)",
-                  borderRight: "2px solid #fff"
-                }}
-              >
-                <div className="overflow-y-auto p-0 relative flex flex-col w-full max-h-min">
-                  <Sidebar />
-                  {/* Close button inside sidebar */}
-                  <button
-                    className="absolute top-4 right-4 text-[#2563eb] bg-white rounded-full p-2 shadow"
-                    onClick={() => setSidebarOpen(false)}
-                    aria-label="Close sidebar"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 20 20">
-                      <line x1="5" y1="5" x2="15" y2="15" stroke="#2563eb" strokeWidth="2"/>
-                      <line x1="15" y1="5" x2="5" y2="15" stroke="#2563eb" strokeWidth="2"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            )}
+      <div className="relative w-full flex-1 px">
+        
             {/* Resource Listing */}
             <div className="relative flex-1 flex flex-col w-full overflow-x-auto overflow-y-hidden">
               <div className={sidebarOpen ? "transition-all duration-300 relative z-10" : ""}>
@@ -136,8 +76,8 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+
+  
       <div className="flex min-w-full">
 <Footer />
       </div>
