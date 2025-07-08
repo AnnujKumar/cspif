@@ -49,7 +49,37 @@ const Home = () => {
       const matchesCw =
         !filters.cw || filters.cw.length === 0 || filters.cw.includes("CW") || filters.cw.includes(service.cw);
 
-      return matchesSearch && matchesAge && matchesCounty && matchesInsurance && matchesCw;
+      // Partners filter (filter chips)
+      const matchesPartners = (() => {
+        if (!filters.selectedFilter || filters.selectedFilter === "All") {
+          return true; // Show all services when "All" is selected or no filter
+        }
+        
+        if (!service.partners || service.partners.length === 0) {
+          return false; // Services without partners don't match any specific filter
+        }
+
+        // Create mapping between filter chips and actual partner names in the data
+        const partnerMapping = {
+          "Child Welfare (CW)": ["CWS", "Child Welfare", "CW"],
+          "Probation": ["Probation"],
+          "Behavioral Health (BH)": ["Mental Health Plan (MHP)", "BH", "Behavioral Health", "County SUD"],
+          "Developmental Services": ["Regional Center", "Developmental Services"],
+          "Education": ["Education", "Educational"]
+        };
+
+        const targetPartners = partnerMapping[filters.selectedFilter] || [];
+        
+        // Check if any of the service's partners match the selected filter
+        return service.partners.some(partner => 
+          targetPartners.some(targetPartner => 
+            partner.toLowerCase().includes(targetPartner.toLowerCase()) ||
+            targetPartner.toLowerCase().includes(partner.toLowerCase())
+          )
+        );
+      })();
+
+      return matchesSearch && matchesAge && matchesCounty && matchesInsurance && matchesCw && matchesPartners;
     });
   }, [filters]);
 

@@ -68,10 +68,10 @@ const ResourceListing = ({ services = [] }) => {
       {/* Table */}
       <div className="w-full overflow-x-auto" style={{ minHeight: "300px" }}>
         <table
-          className="w-full min-w-[700px] text-sm border-separate table-fixed scroll"
+          className="w-full  min-w-full  text-sm border-separate table-fixed scroll"
           style={{
             borderSpacing: "0 4px",
-            minWidth: "700px",
+            
             width: "auto",
           }}
         >
@@ -154,7 +154,11 @@ const ResourceListing = ({ services = [] }) => {
           <tbody>
             {services.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-8 text-gray-400" style={{ height: "200px", minWidth: "100%" }}>
+                <td colSpan={6} className="text-center py-8 text-gray-400" style={{ 
+                  height: "200px", 
+                  minWidth: "700px", 
+                  width: "100%"
+                }}>
                   No resources found.
                 </td>
               </tr>
