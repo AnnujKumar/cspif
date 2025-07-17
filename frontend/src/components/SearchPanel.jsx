@@ -2,6 +2,30 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
 
+// Reusable dropdown arrow component
+const DropdownArrow = ({ isOpen, size = "16" }) => (
+  <div className={`transform transition-transform duration-200 ${isOpen ? '' : 'rotate-180'}`}>
+    <svg 
+      width={size} 
+      height={size === "16" ? "8" : size === "32" ? "32" : size === "14" ? "10" : "16"} 
+      viewBox={size === "32" ? "0 0 32 32" : size === "14" ? "0 0 24 16" : "0 0 16 8"} 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {size === "32" ? (
+        <>
+          <path d="M21.7852 19H10.1955C9.13619 19 8.5754 17.7102 9.38544 16.9731L15.2426 11.3225C15.7411 10.8925 16.4888 10.8925 16.925 11.3225L22.6576 16.9731C23.4053 17.7102 22.8445 19 21.7852 19Z" fill="#015AB8"/>
+          <path d="M16 31C7.73077 31 1 24.2692 1 16C1 7.73077 7.73077 1 16 1C24.2692 1 31 7.73077 31 16C31 24.2692 24.2692 31 16 31ZM16 1.76923C8.15385 1.76923 1.76923 8.15385 1.76923 16C1.76923 23.8462 8.15385 30.2308 16 30.2308C23.8462 30.2308 30.2308 23.8462 30.2308 16C30.2308 8.15385 23.8462 1.76923 16 1.76923Z" fill="#015AB8"/>
+        </>
+      ) : size === "14" ? (
+        <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
+      ) : (
+        <path d="M0 7.38086L8 -0.000279427L16 7.38086H0Z" fill="#3F5590"/>
+      )}
+    </svg>
+  </div>
+);
+
 // Example options
 const countyOptions = ["County", "Alameda", "Los Angeles", "Sacramento", "San Diego"];
 const insuranceOptions = [
@@ -72,11 +96,7 @@ const CustomDropdown = ({ options, value, onChange }) => {
       >
         <span className="truncate">{value}</span>
         <span className="ml-2 flex-shrink-0">
-          <div className={`transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
-            <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
-              <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
-            </svg>
-          </div>
+          <DropdownArrow isOpen={open} size="14" />
         </span>
       </button>
       {open && (
@@ -121,11 +141,16 @@ const SearchPanel = ({ onSearch }) => {
   const [decisionTreeOpen, setDecisionTreeOpen] = useState(false);
   const [expandedQuestions, setExpandedQuestions] = useState({});
   const [decisionTreeAnswers, setDecisionTreeAnswers] = useState({});
+  const [expandedCategories, setExpandedCategories] = useState({});
+  const [selectedFunnel, setSelectedFunnel] = useState(null); // Add state for funnel selection
   
   // Dialog state for "Other" option
   const [showOtherDialog, setShowOtherDialog] = useState(false);
   const [currentQuestionId, setCurrentQuestionId] = useState(null);
   const [otherInputValue, setOtherInputValue] = useState('');
+  
+  // Save My Preference state
+  const [isPreferenceSaved, setIsPreferenceSaved] = useState(false);
 
   // Decision Tree data
   const decisionTreeQuestions = [
@@ -227,6 +252,14 @@ const SearchPanel = ({ onSearch }) => {
     setDecisionTreeOpen(!decisionTreeOpen);
   };
 
+  // Toggle category expansion
+  const toggleCategory = (category) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+  };
+
   // Toggle question expansion
   const toggleQuestion = (questionId) => {
     setExpandedQuestions(prev => ({
@@ -237,33 +270,47 @@ const SearchPanel = ({ onSearch }) => {
 
   // Handle answer selection - allow toggle functionality
   const handleAnswerSelect = (questionId, option) => {
-    // If "Other" is selected, show inline input
-    if (option === "Other") {
-      setCurrentQuestionId(questionId);
-      setOtherInputValue('');
-      setDecisionTreeAnswers(prev => ({
-        ...prev,
-        [questionId]: option
-      }));
-      return;
-    }
-
-    setDecisionTreeAnswers(prev => {
-      const currentAnswer = prev[questionId];
-      
-      // If the same option is clicked again, unselect it
-      if (currentAnswer === option) {
-        const newAnswers = { ...prev };
-        delete newAnswers[questionId]; // Remove the answer completely
-        return newAnswers;
-      } else {
-        // Otherwise, select the new option
-        return {
+    console.log('Selected:', questionId, option); // Debug log
+    
+    try {
+      // If "Other" is selected, show inline input
+      if (option === "Other") {
+        setCurrentQuestionId(questionId);
+        setOtherInputValue('');
+        setDecisionTreeAnswers(prev => ({
           ...prev,
           [questionId]: option
-        };
+        }));
+        return;
       }
-    });
+
+      // Reset currentQuestionId if it's not "Other"
+      setCurrentQuestionId(null);
+      
+      setDecisionTreeAnswers(prev => {
+        const currentAnswer = prev[questionId];
+        
+        // If the same option is clicked again, unselect it
+        if (currentAnswer === option) {
+          const newAnswers = { ...prev };
+          delete newAnswers[questionId]; // Remove the answer completely
+          return newAnswers;
+        } else {
+          // Otherwise, select the new option
+          return {
+            ...prev,
+            [questionId]: option
+          };
+        }
+      });
+    } catch (error) {
+      console.error('Error in handleAnswerSelect:', error);
+    }
+  };
+
+  // Handle funnel selection
+  const handleFunnelSelect = (funnelNumber) => {
+    setSelectedFunnel(selectedFunnel === funnelNumber ? null : funnelNumber);
   };
 
   // Handle "Other" dialog submission
@@ -274,16 +321,19 @@ const SearchPanel = ({ onSearch }) => {
         [currentQuestionId]: `Other: ${otherInputValue.trim()}`
       }));
     }
-    setShowOtherDialog(false);
     setCurrentQuestionId(null);
     setOtherInputValue('');
   };
 
   // Handle "Other" dialog cancel
   const handleOtherCancel = () => {
-    setShowOtherDialog(false);
     setCurrentQuestionId(null);
     setOtherInputValue('');
+  };
+
+  // Handle Save My Preference toggle
+  const handleSavePreferenceToggle = () => {
+    setIsPreferenceSaved(!isPreferenceSaved);
   };
 
   // Multi-select dropdown logic
@@ -301,14 +351,18 @@ const SearchPanel = ({ onSearch }) => {
 
   // Call onSearch whenever filters change
   useEffect(() => {
-    if (onSearch) {
-      onSearch({
-        search: searchInput,
-        county,
-        insurance,
-        cw,
-        selectedFilter: filterChips[selectedFilter]
-      });
+    try {
+      if (onSearch && typeof onSearch === 'function') {
+        onSearch({
+          search: searchInput,
+          county,
+          insurance,
+          cw,
+          selectedFilter: filterChips[selectedFilter]
+        });
+      }
+    } catch (error) {
+      console.error('Error in onSearch callback:', error);
     }
     // eslint-disable-next-line
   }, [searchInput, county, insurance, cw, selectedFilter]);
@@ -360,11 +414,7 @@ const SearchPanel = ({ onSearch }) => {
             {value.length === 0 ? defaultOption : value.join(', ')}
           </span>
           <span className="ml-2 flex-shrink-0">
-            <div className={`transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
-              <svg width="14" height="10" viewBox="0 0 24 16" fill="none">
-                <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
-              </svg>
-            </div>
+            <DropdownArrow isOpen={open} size="14" />
           </span>
         </button>
         {open && (
@@ -469,10 +519,10 @@ const SearchPanel = ({ onSearch }) => {
 
   // Decision Tree Component
   const DecisionTree = () => (
-    <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen mb-6">
+    <div className="w-full  mb-4">
       {/* Decision Tree Header */}
       <div 
-        className="flex items-center justify-center p-4 cursor-pointer bg-[#E2E4FB] relative"
+        className="flex items-center justify-center p-4 cursor-pointer bg-[#FFF8EA] relative"
         onClick={toggleDecisionTree}
       >
         <h3 
@@ -489,136 +539,588 @@ const SearchPanel = ({ onSearch }) => {
           DECISION TREE
         </h3>
         <div className="ml-5">
-          <div className={`transform transition-transform duration-200 ${decisionTreeOpen ? '' : 'rotate-180'}`}>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21.7852 19H10.1955C9.13619 19 8.5754 17.7102 9.38544 16.9731L15.2426 11.3225C15.7411 10.8925 16.4888 10.8925 16.925 11.3225L22.6576 16.9731C23.4053 17.7102 22.8445 19 21.7852 19Z" fill="#015AB8"/>
-              <path d="M16 31C7.73077 31 1 24.2692 1 16C1 7.73077 7.73077 1 16 1C24.2692 1 31 7.73077 31 16C31 24.2692 24.2692 31 16 31ZM16 1.76923C8.15385 1.76923 1.76923 8.15385 1.76923 16C1.76923 23.8462 8.15385 30.2308 16 30.2308C23.8462 30.2308 30.2308 23.8462 30.2308 16C30.2308 8.15385 23.8462 1.76923 16 1.76923Z" fill="#015AB8"/>
-            </svg>
-          </div>
+          <DropdownArrow isOpen={decisionTreeOpen} size="32" />
         </div>
       </div>
 
       {/* Decision Tree Content */}
       {decisionTreeOpen && (
-        <div className="bg-white px-6 py-6">
-          <div className="max-w-6xl mx-auto space-y-4">
-            {decisionTreeQuestions
-              .filter(q => {
-                if (!q.parentId) return true;
-                if (q.showWhen) return q.showWhen(decisionTreeAnswers);
-                return true;
-              })
-              .map((q, index) => {
-                const mainQuestions = decisionTreeQuestions.filter(question => !question.parentId);
-                const questionNumber = q.parentId 
-                  ? `${q.parentId}.${q.id.toString().split('.')[1]}` 
-                  : mainQuestions.findIndex(mainQ => mainQ.id === q.id) + 1;
-                
-                return (
-                  <div key={q.id} className={`${q.parentId ? 'ml-8' : ''}`}>
-                    {/* Question Container - includes both header and options */}
+        <div className="bg-[#FFF8EA] px-6 py-6">
+          <div className="max-w-6xl mx-auto space-y-1">
+            {/* Show Categories First */}
+            {["DEMOGRAPHIC", "FUNNEL"].map((category) => (
+              <div key={category}>
+                {category === "DEMOGRAPHIC" ? (
+                  <>
+                    {/* Category Header */}
                     <div 
-                      className={`transition-all duration-200 ${
-                        expandedQuestions[q.id] 
-                          ? 'bg-[#E2E4FB] border-2 border-[#3B82F6] rounded-lg' 
-                          : 'bg-transparent'
-                      }`}
+                      className="flex items-center justify-between p-4 cursor-pointer bg-[#E2E4FB]"
+                      onClick={() => toggleCategory(category)}
                     >
-                      {/* Question Header */}
-                      <div 
-                        className="flex items-start justify-between p-4 cursor-pointer"
-                        onClick={() => toggleQuestion(q.id)}
-                      >
-                        <div className="flex-1">
-                          <span 
-                            className="text-[#333]" 
-                            style={{ 
-                              fontFamily: 'Open Sans, sans-serif',
-                              fontWeight: 400,
-                              fontSize: '18px',
-                              lineHeight: '115%',
-                              letterSpacing: '1%'
-                            }}
-                          >
-                            {questionNumber}. {q.question}
-                          </span>
-                        </div>
-                        <div className={`transform transition-transform duration-200 ml-4 flex-shrink-0 ${expandedQuestions[q.id] ? '' : 'rotate-180'}`}>
-                          <svg width="16" height="8" viewBox="0 0 16 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0 7.38086L8 -0.000279427L16 7.38086H0Z" fill="#3F5590"/>
-                          </svg>
-                        </div>
+                      <div className="flex-1">
+                        <span 
+                          className="text-[#333]" 
+                          style={{ 
+                            fontFamily: 'Open Sans, sans-serif',
+                            fontWeight: 400,
+                            fontSize: '20px',
+                            lineHeight: '100%',
+                            letterSpacing: '0%',
+                            textTransform: 'uppercase'
+                          }}
+                        >
+                          {category}
+                        </span>
                       </div>
+                      <div className="ml-4 flex-shrink-0">
+                        <DropdownArrow isOpen={expandedCategories[category]} size="32" />
+                      </div>
+                    </div>
 
-                      {/* Question Options - within the same container */}
-                      {expandedQuestions[q.id] && (
-                        <div className="px-4 pb-4">
-                          <div className="flex flex-wrap gap-6">
-                            {q.options.map((option, optionIndex) => {
-                              const isSelected = decisionTreeAnswers[q.id] === option || 
-                                                (option === "Other" && decisionTreeAnswers[q.id]?.startsWith("Other:"));
+                    {/* Category Questions */}
+                    {expandedCategories[category] && (
+                      <div className="mt-2 space-y-1">
+                        {decisionTreeQuestions
+                          .filter(q => q.category && q.category.toUpperCase() === category)
+                          .map((question) => (
+                            <div key={question.id} className="bg-[#F5F5F5] p-4">
+                              {/* Question Header with Dropdown Arrow */}
+                              <div 
+                                className="flex items-center justify-between cursor-pointer w-full"
+                                onClick={() => toggleQuestion(question.id)}
+                              >
+                                <div className="flex-1">
+                                  <p className="text-[#333] font-medium"
+                                     style={{
+                                       fontFamily: 'Open Sans, sans-serif',
+                                       fontWeight: 400,
+                                       fontSize: '18px',
+                                       lineHeight: '114.99999999999999%',
+                                       letterSpacing: '1%'
+                                     }}>
+                                    {question.question}
+                                  </p>
+                                </div>
+                                <div className="ml-4 flex-shrink-0">
+                                  <div className={`transform transition-transform duration-200 ${expandedQuestions[question.id] ? 'rotate-180' : ''}`}>
+                                    <svg 
+                                      width="10" 
+                                      height="10" 
+                                      viewBox="0 0 24 16" 
+                                      fill="none" 
+                                      xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                      <polygon points="12,14 4,6 20,6" fill="#3B4A9F"/>
+                                    </svg>
+                                  </div>
+                                </div>
+                              </div>
                               
-                              return (
-                                <div 
-                                  key={optionIndex}
-                                  className="flex items-center"
-                                >
-                                  <div 
-                                    className="flex items-center cursor-pointer"
-                                    onClick={() => handleAnswerSelect(q.id, option)}
-                                  >
-                                    {/* Radio button for all questions */}
-                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-colors ${
-                                      isSelected 
-                                        ? 'bg-white border-[#E53E3E]' 
-                                        : 'bg-white border-[#CBD5E1]'
-                                    }`}>
-                                      {/* Grey dot when not selected, red dot when selected */}
-                                      <div className={`w-3 h-3 rounded-full ${
-                                        isSelected 
-                                          ? 'bg-[#E53E3E]' 
-                                          : 'bg-[#CBD5E1]'
-                                      }`}>
+                              {/* Options - Only show when question is expanded */}
+                              {expandedQuestions[question.id] && (
+                                <div className="mt-4">
+                                  <div className="flex flex-wrap gap-4">
+                                    {question.options.map((option, optionIndex) => (
+                                      <div key={optionIndex} className="flex items-center">
+                                        <div className="relative mr-2">
+                                          <input
+                                            type="radio"
+                                            id={`q${question.id}-option${optionIndex}`}
+                                            name={`question-${question.id}`}
+                                            checked={decisionTreeAnswers[question.id] === option}
+                                            onChange={(e) => {
+                                              if (e.target.checked) {
+                                                handleAnswerSelect(question.id, option);
+                                              }
+                                            }}
+                                            className="sr-only"
+                                          />
+                                          <div
+                                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-150
+                                              ${decisionTreeAnswers[question.id] === option 
+                                                ? 'border-[#D14B3A] bg-white' 
+                                                : 'border-gray-400 bg-white hover:border-gray-500'
+                                              }`}
+                                            onClick={() => handleAnswerSelect(question.id, option)}
+                                          >
+                                            <div className={`w-2.5 h-2.5 rounded-full
+                                              ${decisionTreeAnswers[question.id] === option 
+                                                ? 'bg-[#D14B3A]' 
+                                                : 'bg-gray-400'
+                                              }`}>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <label
+                                          htmlFor={`q${question.id}-option${optionIndex}`}
+                                          className="text-[#333] cursor-pointer"
+                                          style={{
+                                            fontFamily: 'Open Sans, sans-serif',
+                                            fontWeight: 400,
+                                            fontSize: '18px',
+                                            lineHeight: '114.99999999999999%',
+                                            letterSpacing: '1%'
+                                          }}
+                                          onClick={() => handleAnswerSelect(question.id, option)}
+                                        >
+                                          {option}
+                                        </label>
                                       </div>
-                                    </div>
-                                    <span className="text-[15px] text-[#333] select-none" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                                      {option === "Other" && decisionTreeAnswers[q.id]?.startsWith("Other:") 
-                                        ? decisionTreeAnswers[q.id] 
-                                        : option}
-                                    </span>
+                                    ))}
                                   </div>
                                   
-                                  {/* Inline input for "Other" option */}
-                                  {option === "Other" && isSelected && (
-                                    <input
-                                      type="text"
-                                      value={otherInputValue}
-                                      onChange={(e) => setOtherInputValue(e.target.value)}
-                                      onBlur={handleOtherSubmit}
-                                      onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                          handleOtherSubmit();
-                                        } else if (e.key === 'Escape') {
-                                          handleOtherCancel();
-                                        }
-                                      }}
-                                      placeholder="Specify..."
-                                      className="ml-3 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
-                                      style={{ fontFamily: 'Open Sans, sans-serif' }}
-                                      autoFocus
-                                      onClick={(e) => e.stopPropagation()}
-                                    />
+                                  {/* Show text input for "Other" option */}
+                                  {question.options.includes("Other") && decisionTreeAnswers[question.id] === "Other" && (
+                                    <div className="mt-3">
+                                      <input
+                                        type="text"
+                                        placeholder="Please specify..."
+                                        value={otherInputValue}
+                                        onChange={(e) => setOtherInputValue(e.target.value)}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            handleOtherSubmit();
+                                          }
+                                        }}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-[#D14B3A]"
+                                        autoFocus
+                                      />
+                                    </div>
                                   )}
                                 </div>
-                              );
-                            })}
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // FUNNEL Category with two partitions
+                  <>
+                    {/* Category Header */}
+                    <div 
+                      className="flex items-center justify-between p-4 cursor-pointer bg-[#E2E4FB]"
+                      onClick={() => toggleCategory(category)}
+                    >
+                      <div className="flex-1">
+                        <span 
+                          className="text-[#333]" 
+                          style={{ 
+                            fontFamily: 'Open Sans, sans-serif',
+                            fontWeight: 400,
+                            fontSize: '20px',
+                            lineHeight: '100%',
+                            letterSpacing: '0%',
+                            textTransform: 'uppercase'
+                          }}
+                        >
+                          {category}
+                        </span>
+                      </div>
+                      <div className="ml-4 flex-shrink-0">
+                        <DropdownArrow isOpen={expandedCategories[category]} size="32" />
+                      </div>
+                    </div>
+
+                    {/* FUNNEL Content with two partitions */}
+                    {expandedCategories[category] && (
+                      <div className="mt-2 space-y-1">
+                        {/* Horizontal layout for FUNNEL-1 and FUNNEL-2 */}
+                        <div className="flex gap-1">
+                          {/* FUNNEL-1 Section */}
+                          <div className="flex-1">
+                            <div className={`p-4 ${selectedFunnel === 1 ? 'bg-white' : 'bg-[#ECEEFF]'}`}>
+                              <div className="flex items-center justify-center">
+                                <span 
+                                  className="text-[#333]" 
+                                  style={{ 
+                                    fontFamily: 'Open Sans, sans-serif',
+                                    fontWeight: 400,
+                                    fontSize: '18px',
+                                    lineHeight: '114.99999999999999%',
+                                    letterSpacing: '1%'
+                                  }}
+                                >
+                                  FUNNEL - 1
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Question section below FUNNEL-1 */}
+                            <div 
+                              className={`p-4 cursor-pointer transition-all duration-200 min-h-[120px] flex items-center mt-2 ${
+                                selectedFunnel === 1 
+                                  ? 'bg-white border-b-2 border-blue-500' 
+                                  : 'bg-[#F5F5F5] hover:bg-gray-200'
+                              }`}
+                              onClick={() => handleFunnelSelect(1)}
+                            >
+                              <div className="flex items-center">
+                                <div className="relative mr-3">
+                                  <input
+                                    type="radio"
+                                    id="funnel-1"
+                                    name="funnel-selection"
+                                    checked={selectedFunnel === 1}
+                                    onChange={() => handleFunnelSelect(1)}
+                                    className="sr-only"
+                                  />
+                                  <div
+                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-150
+                                      ${selectedFunnel === 1 
+                                        ? 'border-[#015AB8] bg-white' 
+                                        : 'border-gray-400 bg-white hover:border-gray-500'
+                                      }`}
+                                  >
+                                    <div className={`w-2.5 h-2.5 rounded-full
+                                      ${selectedFunnel === 1 
+                                        ? 'bg-[#015AB8]' 
+                                        : 'bg-gray-400'
+                                      }`}>
+                                    </div>
+                                  </div>
+                                </div>
+                                <p className="text-[#333]"
+                                   style={{
+                                     fontFamily: 'Open Sans, sans-serif',
+                                     fontWeight: 400,
+                                     fontSize: '18px',
+                                     lineHeight: '114.99999999999999%',
+                                     letterSpacing: '1%'
+                                   }}>
+                                  If you would like more information about system partner placements and services, select Funnel 1
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* FUNNEL-2 Section */}
+                          <div className="flex-1">
+                            <div className={`p-4 ${selectedFunnel === 2 ? 'bg-white' : 'bg-[#ECEEFF]'}`}>
+                              <div className="flex items-center justify-center">
+                                <span 
+                                  className="text-[#333]" 
+                                  style={{ 
+                                    fontFamily: 'Open Sans, sans-serif',
+                                    fontWeight: 400,
+                                    fontSize: '18px',
+                                    lineHeight: '114.99999999999999%',
+                                    letterSpacing: '1%'
+                                  }}
+                                >
+                                  FUNNEL - 2
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Question section below FUNNEL-2 */}
+                            <div 
+                              className={`p-4 cursor-pointer transition-all duration-200 min-h-[120px] flex items-center mt-2 ${
+                                selectedFunnel === 2 
+                                  ? 'bg-white border-b-2 border-blue-500' 
+                                  : 'bg-[#F5F5F5] hover:bg-gray-200'
+                              }`}
+                              onClick={() => handleFunnelSelect(2)}
+                            >
+                              <div className="flex items-center">
+                                <div className="relative mr-3">
+                                  <input
+                                    type="radio"
+                                    id="funnel-2"
+                                    name="funnel-selection"
+                                    checked={selectedFunnel === 2}
+                                    onChange={() => handleFunnelSelect(2)}
+                                    className="sr-only"
+                                  />
+                                  <div
+                                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-150
+                                      ${selectedFunnel === 2 
+                                        ? 'border-[#015AB8] bg-white' 
+                                        : 'border-gray-400 bg-white hover:border-gray-500'
+                                      }`}
+                                  >
+                                    <div className={`w-2.5 h-2.5 rounded-full
+                                      ${selectedFunnel === 2 
+                                        ? 'bg-[#015AB8]' 
+                                        : 'bg-gray-400'
+                                      }`}>
+                                    </div>
+                                  </div>
+                                </div>
+                                <p className="text-[#333]"
+                                   style={{
+                                     fontFamily: 'Open Sans, sans-serif',
+                                     fontWeight: 400,
+                                     fontSize: '18px',
+                                     lineHeight: '114.99999999999999%',
+                                     letterSpacing: '1%'
+                                   }}>
+                                  If you would like child-specific resources, select Funnel 2
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+
+                        {/* Full-width questions section that appears when Funnel 1 is selected */}
+                        {selectedFunnel === 1 && (
+                          <div className="mt-4 bg-white p-6 border border-gray-200 w-full">
+                            {/* Question 1 for Funnel 1 */}
+                            <div className="mb-6">
+                              <p className="text-[#333] mb-4 font-medium"
+                                 style={{
+                                   fontFamily: 'Open Sans, sans-serif',
+                                   fontWeight: 400,
+                                   fontSize: '16px',
+                                   lineHeight: '114.99999999999999%',
+                                   letterSpacing: '1%'
+                                 }}>
+                                1. If you would like more information about system partner placements and services, please identify which system and which resource you would like to learn more about.
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {["Child welfare services (CWS)", "Behavioral health (BH)", "Regional Center", "Probation", "Education"].map((option, index) => (
+                                  <button
+                                    key={index}
+                                    className={`px-4 py-2 rounded-full border transition-all duration-150 ${
+                                      decisionTreeAnswers[4] === option
+                                        ? 'bg-[#015AB8] text-white border-[#015AB8]'
+                                        : 'bg-white text-[#333] border-gray-300 hover:border-[#015AB8]'
+                                    }`}
+                                    style={{
+                                      fontFamily: 'Open Sans, sans-serif',
+                                      fontWeight: 400,
+                                      fontSize: '14px',
+                                      lineHeight: '114.99999999999999%',
+                                      letterSpacing: '1%'
+                                    }}
+                                    onClick={() => handleAnswerSelect(4, option)}
+                                  >
+                                    {option}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Separator */}
+                            <hr className="border-gray-200 mb-6" />
+
+                            {/* Question 2 for Funnel 1 - Always visible */}
+                            <div className="mb-6">
+                              <p className="text-[#333] mb-4 font-medium"
+                                 style={{
+                                   fontFamily: 'Open Sans, sans-serif',
+                                   fontWeight: 400,
+                                   fontSize: '16px',
+                                   lineHeight: '114.99999999999999%',
+                                   letterSpacing: '1%'
+                                 }}>
+                                2. Would you like to know more about services and/or supports from the systems selected?
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {["Services", "Placement options", "Both"].map((option, index) => (
+                                  <button
+                                    key={index}
+                                    className={`px-4 py-2 rounded-full border transition-all duration-150 ${
+                                      decisionTreeAnswers[4.1] === option
+                                        ? 'bg-[#D14B3A] text-white border-[#D14B3A]'
+                                        : 'bg-white text-[#333] border-gray-300 hover:border-[#D14B3A]'
+                                    }`}
+                                    style={{
+                                      fontFamily: 'Open Sans, sans-serif',
+                                      fontWeight: 400,
+                                      fontSize: '14px',
+                                      lineHeight: '114.99999999999999%',
+                                      letterSpacing: '1%'
+                                    }}
+                                    onClick={() => handleAnswerSelect(4.1, option)}
+                                  >
+                                    {option}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Full-width questions section that appears when Funnel 2 is selected */}
+                        {selectedFunnel === 2 && (
+                          <div className="mt-4 bg-white p-6 border border-gray-200 w-full">
+                            {/* Question 1 for Funnel 2 */}
+                            <div className="mb-6">
+                              <p className="text-[#333] mb-4 font-medium"
+                                 style={{
+                                   fontFamily: 'Open Sans, sans-serif',
+                                   fontWeight: 400,
+                                   fontSize: '16px',
+                                   lineHeight: '114.99999999999999%',
+                                   letterSpacing: '1%'
+                                 }}>
+                                1. If you would like child-specific resources, please select from the following resource choices.
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {["Services", "Placement Options", "Both"].map((option, index) => (
+                                  <button
+                                    key={index}
+                                    className={`px-4 py-2 rounded-full border transition-all duration-150 ${
+                                      decisionTreeAnswers[3] === option
+                                        ? 'bg-[#D14B3A] text-white border-[#D14B3A]'
+                                        : 'bg-white text-[#333] border-gray-300 hover:border-[#D14B3A]'
+                                    }`}
+                                    style={{
+                                      fontFamily: 'Open Sans, sans-serif',
+                                      fontWeight: 400,
+                                      fontSize: '14px',
+                                      lineHeight: '114.99999999999999%',
+                                      letterSpacing: '1%'
+                                    }}
+                                    onClick={() => handleAnswerSelect(3, option)}
+                                  >
+                                    {option}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Separator */}
+                            <hr className="border-gray-200 mb-6" />
+
+                            {/* Question 2 for Funnel 2 */}
+                            <div className="mb-6">
+                              <p className="text-[#333] mb-4 font-medium"
+                                 style={{
+                                   fontFamily: 'Open Sans, sans-serif',
+                                   fontWeight: 400,
+                                   fontSize: '16px',
+                                   lineHeight: '114.99999999999999%',
+                                   letterSpacing: '1%'
+                                 }}>
+                                2. What systems already serve the youth? Select all that apply.
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {["Services", "Placement options", "Both"].map((option, index) => (
+                                  <button
+                                    key={index}
+                                    className={`px-4 py-2 rounded-full border transition-all duration-150 ${
+                                      decisionTreeAnswers[3.1] === option
+                                        ? 'bg-[#D14B3A] text-white border-[#D14B3A]'
+                                        : 'bg-white text-[#333] border-gray-300 hover:border-[#D14B3A]'
+                                    }`}
+                                    style={{
+                                      fontFamily: 'Open Sans, sans-serif',
+                                      fontWeight: 400,
+                                      fontSize: '14px',
+                                      lineHeight: '114.99999999999999%',
+                                      letterSpacing: '1%'
+                                    }}
+                                    onClick={() => handleAnswerSelect(3.1, option)}
+                                  >
+                                    {option}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Separator */}
+                            <hr className="border-gray-200 mb-6" />
+
+                            {/* Question 3 for Funnel 2 */}
+                            <div className="mb-6">
+                              <p className="text-[#333] mb-4 font-medium"
+                                 style={{
+                                   fontFamily: 'Open Sans, sans-serif',
+                                   fontWeight: 400,
+                                   fontSize: '16px',
+                                   lineHeight: '114.99999999999999%',
+                                   letterSpacing: '1%'
+                                 }}>
+                                3. What complex needs or issues does the youth have? Select all that apply.
+                              </p>
+                              
+                              {/* Radio button options */}
+                              <div className="flex flex-wrap gap-4 mb-4">
+                                {["Developmental needs", "Education needs", "Substance use disorder(s)", "Child Trafficking", "Education needs", "Other"].map((option, index) => (
+                                  <div key={index} className="flex items-center">
+                                    <div className="relative mr-2">
+                                      <input
+                                        type="radio"
+                                        id={`q3.2-option${index}`}
+                                        name="question-3.2"
+                                        checked={decisionTreeAnswers[3.2] === option}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            handleAnswerSelect(3.2, option);
+                                          }
+                                        }}
+                                        className="sr-only"
+                                      />
+                                      <div
+                                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-150
+                                          ${decisionTreeAnswers[3.2] === option 
+                                            ? 'border-[#D14B3A] bg-white' 
+                                            : 'border-gray-400 bg-white hover:border-gray-500'
+                                          }`}
+                                        onClick={() => handleAnswerSelect(3.2, option)}
+                                      >
+                                        <div className={`w-2.5 h-2.5 rounded-full
+                                          ${decisionTreeAnswers[3.2] === option 
+                                            ? 'bg-[#D14B3A]' 
+                                            : 'bg-gray-400'
+                                          }`}>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <label
+                                      htmlFor={`q3.2-option${index}`}
+                                      className="text-[#333] cursor-pointer"
+                                      style={{
+                                        fontFamily: 'Open Sans, sans-serif',
+                                        fontWeight: 400,
+                                        fontSize: '14px',
+                                        lineHeight: '114.99999999999999%',
+                                        letterSpacing: '1%'
+                                      }}
+                                      onClick={() => handleAnswerSelect(3.2, option)}
+                                    >
+                                      {option}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              {/* Greyed out extended options section */}
+                              <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                                <div className="flex flex-wrap gap-2">
+                                  {["Absent from care", "Assessment/Evaluation", "Career guidance", "Chronic absenteeism", "Developmental needs diagnosis", "Dual jurisdiction youth CW and Probation", "Family Connection", "Family Criminality", "Gang affiliation/membership", "High-risk sexual behavior", "Homelessness", "Hospitalization", "IEP / 504", "Independent living skills", "In-Patient", "Learning disabilities", "LGBTQIA+", "Mental Health Crisis", "Missing", "Physically Assaultive", "Suicidal / Self Harm", "Suspension / Expulsion", "Teaming", "Threatening Physical Violence", "Truancy", "Victim Awareness", "Vocational Training"].map((option, index) => (
+                                    <button
+                                      key={`extended-${index}`}
+                                      className={`px-3 py-1.5 rounded-full border transition-all duration-150 text-sm ${
+                                        decisionTreeAnswers[`3.2.${index}`] === option
+                                          ? 'bg-[#D14B3A] text-white border-[#D14B3A]'
+                                          : 'bg-gray-200 text-gray-600 border-gray-300 hover:border-gray-400'
+                                      }`}
+                                      style={{
+                                        fontFamily: 'Open Sans, sans-serif',
+                                        fontWeight: 400,
+                                        fontSize: '12px',
+                                        lineHeight: '114.99999999999999%',
+                                        letterSpacing: '1%'
+                                      }}
+                                      onClick={() => handleAnswerSelect(`3.2.${index}`, option)}
+                                    >
+                                      {option}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -643,18 +1145,13 @@ const SearchPanel = ({ onSearch }) => {
       </div>
 
       {/* Decision Tree */}
-      <div className="w-full md:w-[80%] mb-4">
+      <div className="w-[80%] flex justify-center"><div className="w-[100%] mb-4">
         <DecisionTree />
-      </div>
-
+      </div></div>
       {/* Filters */}
       <div className="md:w-[80%] bg-[#f6f8ff] rounded-xl p-4 shadow flex flex-col gap-3 sm:w-full">
         {/* Dropdowns - remove Age dropdown */}
-        <div className="flex gap-4 w-full flex-col sm:flex-row">
-          <MultiSelectDropdown options={countyOptions} value={county} setValue={setCounty} defaultOption="County" />
-          <MultiSelectDropdown options={insuranceOptions} value={insurance} setValue={setInsurance} defaultOption="Insurance" />
-          <MultiSelectDropdown options={cwOptions} value={cw} setValue={setCw} defaultOption="Child Welfare" />
-        </div>
+        
         
         {/* Search Bar */}
         <div className={`flex items-center rounded-lg px-4 py-4 bg-white transition-all duration-150
@@ -703,8 +1200,31 @@ const SearchPanel = ({ onSearch }) => {
         </div>
       </div>
 
-      {/* Clear All Button moved outside */}
-      <div className="w-[100%] sm:w-[80%] flex justify-end mt-2 ">
+      {/* Bottom buttons section */}
+      <div className="w-[100%] sm:w-[80%] flex justify-between items-center mt-2">
+        {/* Save My Preference Button - Left */}
+        <button
+          onClick={handleSavePreferenceToggle}
+          className="flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-150"
+          style={{
+            fontFamily: 'Open Sans, sans-serif',
+            fontWeight: 400,
+            fontSize: '16px',
+            lineHeight: '114.99999999999999%',
+            letterSpacing: '1%',
+            color: '#015AB8',
+            background: 'transparent',
+            border: 'none'
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1.09375" y="1.09082" width="21.8182" height="21.8182" fill={isPreferenceSaved ? "#015AB8" : "#E2E4FB"}/>
+            <path d="M1.37791 0.000125028C0.674643 -0.00799572 0.0144335 0.380148 0 0.968127V23.0229C0.0726698 23.8001 0.754016 23.9573 1.37791 23.9996H22.6308C23.2268 24.0144 23.9654 23.6211 24 23.0229V0.968127C23.8072 0.19924 23.2704 0.0328173 22.6308 0.000125028H1.37791ZM1.67442 1.67451H22.3256V22.3252H1.67442V1.67451ZM17.939 6.69765L9.62791 14.9649L6.06105 11.4156L4.88372 12.5929C6.46379 14.1639 8.05231 15.7265 9.62791 17.3021C12.787 14.1531 15.9529 11.0109 19.1163 7.86623L17.939 6.69765Z" fill={isPreferenceSaved ? "#FFFFFF" : "#015AB8"}/>
+          </svg>
+          Save My Preference
+        </button>
+
+        {/* Clear All Button - Right */}
         <button
           onClick={clearAll}
           style={buttonTextStyle}
