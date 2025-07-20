@@ -18,7 +18,7 @@ const Home = () => {
     const fetchServices = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://217.196.48.69:8000/api/data');
+        const response = await fetch('http://217.196.48.69:8000/api/all_data');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -47,22 +47,19 @@ const Home = () => {
   const filteredServices = React.useMemo(() => {
     if (!filters) return services;
     return services.filter(service => {
-      // Search filter (case-insensitive, matches title or description)
+      // Search filter (case-insensitive, matches service_type or description)
       const search = filters.search?.trim().toLowerCase() || '';
       const matchesSearch =
         !search ||
-        service.title.toLowerCase().includes(search) ||
+        service.service_type.toLowerCase().includes(search) ||
         service.description.toLowerCase().includes(search);
 
-      // Multi-select filters
-      const matchesAge =
-        !filters.age || filters.age.length === 0 || filters.age.includes("Age") || filters.age.includes(service.age);
-      const matchesCounty =
-        !filters.county || filters.county.length === 0 || filters.county.includes("County") || filters.county.includes(service.county);
-      const matchesInsurance =
-        !filters.insurance || filters.insurance.length === 0 || filters.insurance.includes("Insurance") || filters.insurance.includes(service.insurance);
-      const matchesCw =
-        !filters.cw || filters.cw.length === 0 || filters.cw.includes("CW") || filters.cw.includes(service.cw);
+      // Multi-select filters - Note: API doesn't have age, county, insurance, cw fields
+      // These filters are kept for UI compatibility but will match all services since fields don't exist
+      const matchesAge = true; // API doesn't have age field
+      const matchesCounty = true; // API doesn't have county field  
+      const matchesInsurance = true; // API doesn't have insurance field
+      const matchesCw = true; // API doesn't have cw field
 
       // Partners filter (filter chips)
       const matchesPartners = (() => {

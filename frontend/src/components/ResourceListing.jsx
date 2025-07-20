@@ -194,7 +194,7 @@ const ResourceListing = ({ services = [] }) => {
     letterSpacing: "1%",
   }}
 >
-  {res.type || res.title}
+  {res.service_type}
 </td>
                     <td className="py-3 px-2 align-top text-[#222]" style={{ position: "relative", overflow: "visible" }}>
                       <div
