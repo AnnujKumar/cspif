@@ -138,11 +138,11 @@ const SearchPanel = ({ onSearch }) => {
   const searchInputRef = useRef();
 
   // Decision Tree state
-  const [decisionTreeOpen, setDecisionTreeOpen] = useState(false);
+  const [decisionTreeOpen, setDecisionTreeOpen] = useState(true); // Open by default
   const [expandedQuestions, setExpandedQuestions] = useState({});
   const [decisionTreeAnswers, setDecisionTreeAnswers] = useState({});
-  const [expandedCategories, setExpandedCategories] = useState({});
-  const [selectedFunnel, setSelectedFunnel] = useState(null); // Add state for funnel selection
+  const [expandedCategories, setExpandedCategories] = useState({ FUNNEL: true }); // Open FUNNEL category by default
+  const [selectedFunnel, setSelectedFunnel] = useState(1); // Set Funnel 1 as default
   
   // Dialog state for "Other" option
   const [showOtherDialog, setShowOtherDialog] = useState(false);
