@@ -166,7 +166,7 @@ const Home = () => {
       </div>
 
       {/* Main content area with blur overlay when sidebarOpen */}
-      <div className="relative w-full flex-1 px">
+      <div className="relative w-full flex-1 px-2">
         
             {/* Resource Listing */}
             <div className="relative flex-1 flex flex-col w-full overflow-x-auto overflow-y-hidden">

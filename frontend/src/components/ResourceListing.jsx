@@ -35,7 +35,7 @@ const ResourceListing = ({ services = [] }) => {
 
   return (
     <div
-      className="flex flex-col flex-1 bg-white rounded-xl border border-[#bfc6ea] p-0  scroll w-full"
+      className="flex flex-col flex-1 bg-white rounded-xl border border-[#bfc6ea] p-0  scroll w-full "
       style={{
         // Remove fixed height and scrolling for natural expansion
         // height: "75vh",
